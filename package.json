@@ -1,0 +1,28 @@
+{
+  "name": "nuxt-app",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@next-auth/prisma-adapter": "^1.0.7",
+    "@nuxt/devtools": "latest",
+    "@nuxtjs/tailwindcss": "^6.7.2",
+    "@sidebase/nuxt-auth": "^0.6.3",
+    "@types/node": "^18",
+    "next-auth": "^4.21.1",
+    "nuxt": "^3.9.0",
+    "nuxt-headlessui": "^1.1.4",
+    "nuxt-icon": "^0.4.1",
+    "prisma": "^4.15.0",
+    "sass": "^1.63.4",
+    "sass-loader": "^13.3.2"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.15.0"
+  }
+}
