@@ -92,7 +92,7 @@ function selectionChanged(piece: SelectionPiece<any>, selected: string) {
         <div v-if="isLast" class="container-end" :class="[type.color]"></div>
     </div>
     <div v-else class="normal-piece" :class="[type.color]" @mousedown.left.stop="$emit('startDragging', $event)">
-        <EditorPieceRender v-for="piece in pieces" :piece="piece" :key="piece" @change-selection="selectionChanged(piece, $event)" />
+        <EditorPieceRender v-for="piece in pieces" :piece="piece" :key="piece" @change-selection="selectionChanged(piece as SelectionPiece<any>, $event)" />
         <EditorActionMenu v-if="isFirst && actions.length" :actions="actions" @mousedown.stop @run-action="runAction($event)" />
     </div>
 </template>

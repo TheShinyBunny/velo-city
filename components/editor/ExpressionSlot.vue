@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {Block, Property, SelectOption, SlotAttachment} from '~/utils/blocks'
-import {asSingleType, getTypeKey, type NumberType} from '~/utils/types'
+import {type NumberType} from '~/utils/types'
 
 const {property} = defineProps<{property: Property}>()
 const isTemplate = inject('isTemplate', false)

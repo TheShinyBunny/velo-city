@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {type BlockPiece, isSelectionPiece, type Property} from '~/utils/blocks'
+import {type BlockPiece, type Property} from '~/utils/blocks'
 const {piece} = defineProps<{piece: BlockPiece<any>}>()
 defineEmits(['changeSelection'])
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type {BlockCategory} from '~/utils/palette'
-import {type Block, createSingleGroup} from '~/utils/blocks'
+import {type Block} from '~/utils/blocks'
 
 const {category, isOpen} = defineProps<{category: BlockCategory, isOpen: boolean}>()
 defineEmits(['selected'])

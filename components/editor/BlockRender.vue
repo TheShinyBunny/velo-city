@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type {Block, BlockAction, BlockGroup, BlockPiece} from '~/utils/blocks'
+import type {Block, BlockGroup, BlockPiece} from '~/utils/blocks'
 const props = defineProps<{block: Block}>()
 const isTemplate = inject('isTemplate', false)
 const emit = defineEmits(['startDragging', 'attachChanged', 'updateBlock'])
