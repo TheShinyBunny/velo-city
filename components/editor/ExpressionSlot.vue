@@ -117,7 +117,7 @@ function validateInput(event: InputEvent) {
                            @changed="setPropertyValue($event)" />
         <EditorSelectInput v-else-if="typeKey === 'enum'" :value="stringVal" :options="property.type['options']"
                            @changed="setPropertyValue($event)" :placeholder="property.label" />
-        <input v-else-if="property.type === 'color'" :value="stringVal" type="color" class="input !p-0 color-input"
+        <input v-else-if="property.type === 'color'" :value="stringVal" type="color" class="input cursor-pointer !p-0 color-input"
                @input="setPropertyValue($event.target.value)" />
         <span v-else class="input text-black" :contenteditable="isStringLike && !isTemplate"
               :class="{placeholder: !stringVal?.length, 'can-attach': canAttach}"

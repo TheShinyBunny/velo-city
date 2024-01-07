@@ -7,7 +7,7 @@ defineEmits(['runAction'])
 </script>
 
 <template>
-    <Menu as="div" class="relative">
+    <Menu as="div" class="absolute top-1 right-1">
         <MenuButton class="menu-button-round">
             <Icon name="mdi:dots-vertical" />
         </MenuButton>

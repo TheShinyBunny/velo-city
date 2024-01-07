@@ -91,15 +91,19 @@ function selectionChanged(piece: SelectionPiece<any>, selected: string) {
         <EditorBlockGroupRender :group="pieces[0] as BlockGroup" @pick-up="pickUpGroup" :is-template="isTemplate" />
         <div v-if="isLast" class="container-end" :class="[type.color]"></div>
     </div>
-    <div v-else class="normal-piece" :class="[type.color]" @mousedown.left.stop="$emit('startDragging', $event)">
+    <div v-else class="normal-piece" :class="[type.color, {'has-actions': isFirst && actions.length}]" @mousedown.left.stop="$emit('startDragging', $event)">
         <EditorPieceRender v-for="piece in pieces" :piece="piece" :key="piece" @change-selection="selectionChanged(piece as SelectionPiece<any>, $event)" />
         <EditorActionMenu v-if="isFirst && actions.length" :actions="actions" @mousedown.stop @run-action="runAction($event)" />
     </div>
 </template>
 <style scoped lang="scss">
 .normal-piece {
-    @apply p-2 w-fit gap-1 flex flex-wrap items-center text-white cursor-move select-none relative border-2
+    @apply p-2 w-fit max-w-lg gap-1 flex flex-wrap items-center text-white cursor-move select-none relative border-2
     border-black border-opacity-25 pointer-events-auto;
+}
+
+.has-actions {
+    @apply pr-8;
 }
 
 .block-container {

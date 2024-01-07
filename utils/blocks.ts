@@ -1,5 +1,4 @@
 import { Compiler } from "./compiler"
-import {EventBlockType} from '~/utils/events'
 import type {ExpressionType} from '~/utils/types'
 
 export interface Block<T = any> {
@@ -79,6 +78,7 @@ async function createRegistry() {
     const events = await import('./events')
     const logic = await import('./logic')
     const values = await import('./values')
+    const crm = await import('./velo/crm')
     return {
         ifBlock: new control.IfBlock(),
         onReady: new events.OnReady(),
@@ -91,6 +91,7 @@ async function createRegistry() {
         multiFieldAccess: new values.MultiFieldAccessBlock(),
         fieldSetter: new values.FieldSetterBlock(),
         multiFieldSetter: new values.MultiFieldSetterBlock(),
+        sendTriggeredEmail: new crm.SendTriggeredEmail(),
         error: new values.ErrorBlock()
     }
 }

@@ -2,6 +2,7 @@ import type { Block } from "./blocks"
 import {elements} from '~/utils/velo/elements'
 import {inputs} from '~/utils/velo/inputs'
 import {buttons} from '~/utils/velo/buttons'
+import {crm} from '~/utils/velo/crm'
 
 export interface BlockCategory {
     name: string
@@ -33,6 +34,10 @@ export function getCategories(): BlockCategory[] {
         {
             name: 'Inputs',
             blocks: inputs()
+        },
+        {
+            name: 'CRM',
+            blocks: crm()
         }
     ]
 }

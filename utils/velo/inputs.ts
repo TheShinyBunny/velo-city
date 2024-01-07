@@ -3,7 +3,7 @@ import {type Block} from '~/utils/blocks'
 
 export function inputs(): Block[] {
     return [
-        ...createReadWriteElementField('value', 'Value', {type: 'string'}),
+        ...createReadWriteElementField('value', 'Value', 'any'),
         ...createReadWriteElementField('placeholder', 'Placeholder', {type: 'string'}),
         ...createReadWriteElementField('required', 'Required', 'boolean'),
         ...createToggleableAndGetterElementState('Enable', 'Disable', 'Enabled', 'Disabled'),
