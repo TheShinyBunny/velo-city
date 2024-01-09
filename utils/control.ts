@@ -19,8 +19,16 @@ export class IfBlock extends StatementBlock<IfBlockData> {
         return ['If', data.cond, data.then].concat(data.else ? ['Or Else', data.else] : [])
     }
     compile(ctx: Compiler, data: IfBlockData): void {
-        throw new Error("Method not implemented.");
+        ctx.write('if (')
+        ctx.writeProperty(data.cond)
+        ctx.write(') ')
+        ctx.writeGroup(data.then)
+        if (data.else) {
+            ctx.write(' else ')
+            ctx.writeGroup(data.else)
+        }
     }
+
     getActions?(data: IfBlockData): BlockAction<IfBlockData>[] {
         return [
             {

@@ -58,7 +58,9 @@ function onProjectModified() {
 async function saveProject() {
     saveStatus.value = SaveStatus.SAVING
     await $fetch('/api/projects/update', {body: {projectId: project.value.id, structure: blocks.value}, method: 'POST'})
-    saveStatus.value = SaveStatus.SAVED
+    if (saveStatus.value === SaveStatus.SAVING) {
+        saveStatus.value = SaveStatus.SAVED
+    }
 }
 
 function setMousePos(event: MouseEvent) {

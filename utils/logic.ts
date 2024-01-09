@@ -19,8 +19,22 @@ export class Comparison extends ExpressionBlock<ComparisonData> {
     getResultType(data: ComparisonData): ExpressionType {
         return 'boolean'
     }
-    compile(data: ComparisonData, ctx: Compiler) {
-
+    compile(ctx: Compiler, data: ComparisonData) {
+        if (data.left.value?.type === 'comparison') {
+            ctx.write('(')
+            ctx.writeProperty(data.left)
+            ctx.write(')')
+        } else {
+            ctx.writeProperty(data.left)
+        }
+        ctx.write(' ' + data.operand + ' ')
+        if (data.right.value?.type === 'comparison') {
+            ctx.write('(')
+            ctx.writeProperty(data.right)
+            ctx.write(')')
+        } else {
+            ctx.writeProperty(data.right)
+        }
     }
     getActions(): BlockAction<ComparisonData>[] {
         return [
@@ -71,6 +85,14 @@ export class UnaryOperation extends ExpressionBlock<UnaryData> {
         return [data.label, data.value]
     }
     compile(ctx: Compiler, data: UnaryData): void {
+        ctx.write(data.operand)
+        if (data.value.value?.type === 'comparison') {
+            ctx.write('(')
+            ctx.writeProperty(data.value)
+            ctx.write(')')
+        } else {
+            ctx.writeProperty(data.value)
+        }
     }
     getResultType(data: UnaryData): ExpressionType {
         return data.resultType

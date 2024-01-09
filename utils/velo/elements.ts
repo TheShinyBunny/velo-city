@@ -31,6 +31,6 @@ export function elements(): Block[] {
                 type: 'color'
             },
         ]),
-        ...createReadWriteElementField('label', 'Label', {type: 'string'}),
+        ...createReadWriteElementField('label', 'Label', 'string'),
     ]
 }

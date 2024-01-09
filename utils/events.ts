@@ -12,6 +12,8 @@ export class OnReady extends EventBlockType<any> {
         return ['When the page is loaded']
     }
     compile(ctx: Compiler, data: any): void {
+        ctx.writeAll(ctx.eventContent)
+        ctx.flushToOnReady()
     }
 
 }
@@ -29,6 +31,14 @@ export class ElementEvent extends EventBlockType<EventData> {
         return ['When', data.element, 'was', data.label]
     }
     compile(ctx: Compiler, data: EventData) {
+        ctx.writeProperty(data.element)
+        ctx.writeLine('.' + data.key + '(() => ' + '{')
+        ctx.indent(() => {
+            ctx.writeAll(ctx.eventContent)
+        })
+        ctx.writeLine()
+        ctx.write('}')
+        ctx.flushToOnReady()
     }
 
     getActions(data: EventData): BlockAction<EventData>[] {

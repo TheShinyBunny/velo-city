@@ -42,12 +42,12 @@ export function createReadWriteMultiElementFields(fields: TypedSelectOption[]): 
 }
 
 export function createToggleableElementState(trueLabel: string, falseLabel: string): Block {
-    return {type: 'callable', data: {target: createElementProp(), key: trueLabel.toLowerCase(), label: trueLabel, params: [], returnType: 'void', oppositeLabel: falseLabel}}
+    return {type: 'callable', data: {target: createElementProp(), key: trueLabel.toLowerCase(), label: trueLabel, returnType: 'void', oppositeLabel: falseLabel, oppositeKey: falseLabel.toLowerCase()}}
 }
 
 export function createToggleableAndGetterElementState(trueLabel: string, falseLabel: string, getterLabel: string, oppositeLabel: string): Block[] {
     return [
-        {type: 'callable', data: {target: createElementProp(), key: falseLabel.toLowerCase(), label: falseLabel, params: [], returnType: 'void', oppositeLabel: trueLabel, toggleable: getterLabel}},
+        {type: 'callable', data: {target: createElementProp(), key: falseLabel.toLowerCase(), label: falseLabel, returnType: 'void', oppositeLabel: trueLabel, oppositeKey: trueLabel.toLowerCase(), toggleable: getterLabel}},
         {type: 'fieldAccess', data: {target: createElementProp(), key: getterLabel.toLowerCase(), label: getterLabel, type: 'boolean', oppositeLabel}},
     ]
 }

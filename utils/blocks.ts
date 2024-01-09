@@ -1,4 +1,4 @@
-import { Compiler } from "./compiler"
+import {Compiler} from './compiler'
 import type {ExpressionType} from '~/utils/types'
 
 export interface Block<T = any> {
@@ -42,6 +42,7 @@ export interface Property {
     label: string
     type: ExpressionType
     value?: Block
+    optional?: boolean
     error?: string
 }
 
@@ -73,24 +74,26 @@ export interface BlockEditor {
 
 let registry: any
 
-async function createRegistry() {
+export async function createRegistry() {
     const control = await import('./control')
     const events = await import('./events')
     const logic = await import('./logic')
     const values = await import('./values')
+    const fields = await import('./fields')
     const crm = await import('./velo/crm')
-    return {
+    return registry = {
         ifBlock: new control.IfBlock(),
         onReady: new events.OnReady(),
         comparison: new logic.Comparison(),
         unary: new logic.UnaryOperation(),
         literal: new values.LiteralValue(),
         elementEvent: new events.ElementEvent(),
-        callable: new values.CallableBlock(),
-        fieldAccess: new values.FieldAccessBlock(),
-        multiFieldAccess: new values.MultiFieldAccessBlock(),
-        fieldSetter: new values.FieldSetterBlock(),
-        multiFieldSetter: new values.MultiFieldSetterBlock(),
+        callable: new fields.CallableBlock(),
+        multiCallable: new fields.MultiCallableBlock(),
+        fieldAccess: new fields.FieldAccessBlock(),
+        multiFieldAccess: new fields.MultiFieldAccessBlock(),
+        fieldSetter: new fields.FieldSetterBlock(),
+        multiFieldSetter: new fields.MultiFieldSetterBlock(),
         sendTriggeredEmail: new crm.SendTriggeredEmail(),
         error: new values.ErrorBlock()
     }
@@ -105,6 +108,18 @@ export async function getType(type: BlockTypes): Promise<BlockType<any>> {
     if (!reg) reg = await createRegistry()
     return reg[type]
 }
+
+export function getBlockTypeNow<T>(block: Block<T>): BlockType<T> | undefined {
+    return getTypeNow(block.type)
+}
+
+export function getTypeNow(type: BlockTypes): BlockType<any> | undefined {
+    let reg = registry
+    if (!reg) return undefined
+    return reg[type]
+}
+
+
 
 export type BlockTypes = keyof Awaited<ReturnType<typeof createRegistry>>
 

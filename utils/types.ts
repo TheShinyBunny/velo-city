@@ -8,17 +8,20 @@ export type SimpleTypes = 'any'
     | 'image'
     | 'link'
 
-export type ComplexTypes = 'string'
+export type OptionalComplexTypes = 'string'
     | 'date'
-    | 'enum'
     | 'number'
+
+export type RequiredComplexTypes = 'enum'
     | 'array'
     | 'object'
     | 'promise'
 
+export type ComplexTypes = OptionalComplexTypes | RequiredComplexTypes
+
 export type TypeKey = SimpleTypes | ComplexTypes
 
-export type SingleType = SimpleTypes | AllComplexTypes
+export type SingleType = SimpleTypes | OptionalComplexTypes | AllComplexTypes
 
 export type ExpressionType = SingleType | readonly ExpressionType[]
 

@@ -17,7 +17,9 @@ defineEmits(['update:open'])
                         enter-to="opacity-100 scale-100" leave="duration-200 ease-in" leave-from="opacity-100 scale-100"
                         leave-to="opacity-0 scale-95">
                         <DialogPanel class="modal-content">
-                            <slot />
+                            <div class="modal-scroll-area">
+                                <slot />
+                            </div>
                         </DialogPanel>
                     </TransitionChild>
                 </div>
@@ -31,7 +33,4 @@ defineEmits(['update:open'])
     @apply flex min-h-full items-center justify-center p-4 text-center;
 }
 
-.modal-content {
-    @apply w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all;
-}
 </style>

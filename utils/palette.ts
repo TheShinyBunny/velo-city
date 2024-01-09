@@ -24,6 +24,10 @@ export function getCategories(): BlockCategory[] {
             blocks: logic
         },
         {
+            name: 'String',
+            blocks: strings()
+        },
+        {
             name: 'Elements',
             blocks: elements()
         },

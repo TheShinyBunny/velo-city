@@ -73,3 +73,31 @@
         @apply bottom-0 translate-y-3;
     }
 }
+
+.modal-content {
+    @apply w-full max-w-md transform rounded-2xl bg-white text-left align-middle shadow-xl transition-all;
+}
+
+.modal-scroll-area {
+    @apply overflow-y-auto m-1 px-4 py-4 max-h-[78vh];
+}
+
+.modal-lg .modal-content {
+    @apply max-w-3xl;
+}
+
+::-webkit-scrollbar-track {
+    @apply bg-none;
+}
+
+::-webkit-scrollbar {
+    @apply w-2;
+}
+
+::-webkit-scrollbar-thumb {
+    @apply opacity-0;
+}
+
+:hover::-webkit-scrollbar-thumb {
+    @apply opacity-100 rounded-full bg-stone-500 bg-opacity-30 hover:bg-stone-600 hover:bg-opacity-80;
+}

@@ -1,12 +1,15 @@
 <script setup lang="ts">
 import type {Project} from '@prisma/client'
 import {SaveStatus} from '~/composables/useSaveState'
+import type {BlockGroup} from '~/utils/blocks'
 
 const {project} = defineProps<{project: Project}>()
 const emit = defineEmits(['refreshProject'])
 
 let renameModal = ref(false)
 let deleteModal = ref(false)
+let resultsModal = ref(false)
+let compilationResults = ref('')
 
 const dragState = useDragState()
 const blocks = useEditorBlocks()
@@ -16,6 +19,15 @@ function deleteDragged() {
     if (dragState.value.draggedBlocks) {
         dragState.value = {}
     }
+}
+
+function compile() {
+    const compiler = new Compiler()
+    for (let group of blocks.value) {
+        compiler.writeGroup(group as BlockGroup)
+    }
+    compilationResults.value = compiler.createOutput()
+    resultsModal.value = true
 }
 
 const {saveProject} = inject('projectActions')
@@ -67,9 +79,11 @@ const {saveProject} = inject('projectActions')
             <span v-if="saveStatus == SaveStatus.SAVED"><Icon name="mdi:check" size="1.3rem" /> Saved</span>
             <span v-else-if="saveStatus == SaveStatus.SAVING">Saving...</span>
         </div>
+        <button class="btn btn-primary" @click="compile()">Generate</button>
     </div>
     <ModalsRenameProject :name="project.name" :project-id="project.id" v-model:open="renameModal" @closed="emit('refreshProject')" />
     <ModalsDeleteProject v-model:open="deleteModal" :project="project" />
+    <ModalsCompilationResult v-model:open="resultsModal" :results="compilationResults" />
 </template>
 <style scoped lang="scss">
 .navbar {

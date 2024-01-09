@@ -4,7 +4,7 @@ import {type Block} from '~/utils/blocks'
 export function inputs(): Block[] {
     return [
         ...createReadWriteElementField('value', 'Value', 'any'),
-        ...createReadWriteElementField('placeholder', 'Placeholder', {type: 'string'}),
+        ...createReadWriteElementField('placeholder', 'Placeholder', 'string'),
         ...createReadWriteElementField('required', 'Required', 'boolean'),
         ...createToggleableAndGetterElementState('Enable', 'Disable', 'Enabled', 'Disabled'),
         createBoolElementProp('valid', 'Valid', 'Invalid'),

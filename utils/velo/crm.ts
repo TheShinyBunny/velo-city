@@ -6,7 +6,7 @@ import {
     ComputationBlock,
     type Property
 } from '~/utils/blocks'
-import type { Compiler } from '../compiler'
+import  { type Compiler } from '../compiler'
 import type {ExpressionType} from '~/utils/types'
 
 export function crm(): Block[] {
@@ -14,8 +14,8 @@ export function crm(): Block[] {
         {
             type: 'sendTriggeredEmail', data: {
                 isMember: false,
-                email: createProp('Email', {type: 'string'}),
-                target: createProp('Contact ID', {type: 'string'}),
+                email: createProp('Email', 'string'),
+                target: createProp('Contact ID', 'string'),
                 variables: []
             }
         }
@@ -47,6 +47,34 @@ export class SendTriggeredEmail extends ComputationBlock<TriggeredEmailData> {
         ]
     }
     compile(ctx: Compiler, data: TriggeredEmailData): void {
+        ctx.write('triggeredEmails.' + (data.isMember ? 'emailMember' : 'emailContact') + '(')
+        ctx.writeProperty(data.email)
+        ctx.write(', ')
+        ctx.writeProperty(data.target)
+        if (data.variables.length) {
+            ctx.writeLine(', {variables: {')
+            ctx.indent(() => {
+                let first = true
+                for (let variable of data.variables) {
+                    if (!first) {
+                        ctx.writeLine(',')
+                    }
+                    if (variable.key.value?.type === 'literal') {
+                        ctx.writeProperty(variable.key)
+                    } else {
+                        ctx.write('[')
+                        ctx.writeProperty(variable.key)
+                        ctx.write(']')
+                    }
+                    ctx.write(': ')
+                    ctx.writeProperty(variable.value)
+                    first = false
+                }
+            })
+            ctx.writeLine()
+            ctx.write('}')
+        }
+        ctx.write(')')
     }
     getResultType(data: TriggeredEmailData): ExpressionType {
         return {type: 'promise', of: 'void'}
@@ -68,8 +96,8 @@ export class SendTriggeredEmail extends ComputationBlock<TriggeredEmailData> {
                 run(ctx: BlockEditor, block: Block<TriggeredEmailData>): Block<TriggeredEmailData> {
                     return withData(block, {
                         variables: data.variables.concat({
-                            key: createProp('Key', {type: 'string'}),
-                            value: createProp('Value', {type: 'string'}),
+                            key: createProp('Key', 'string'),
+                            value: createProp('Value', 'string'),
                         })
                     })
                 }
@@ -83,5 +111,27 @@ export class SendTriggeredEmail extends ComputationBlock<TriggeredEmailData> {
                 }
             })
         ]
+    }
+}
+
+interface CreateContactData {
+    firstName: Property
+    lastName: Property
+    email: Property
+    phone: Property
+}
+
+export class CreateContact extends ComputationBlock<CreateContactData> {
+    color: string = 'bg-yellow-500'
+
+    compile(ctx: Compiler, data: CreateContactData): void {
+    }
+
+    getResultType(data: CreateContactData): ExpressionType {
+        return {type: 'promise', of: 'string'}
+    }
+
+    render(data: CreateContactData): BlockPiece<CreateContactData>[] {
+        return []
     }
 }
