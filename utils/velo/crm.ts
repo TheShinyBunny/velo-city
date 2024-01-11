@@ -56,7 +56,7 @@ export class SendTriggeredEmail extends ComputationBlock<TriggeredEmailData> {
     }
 
     compile(ctx: Compiler, data: TriggeredEmailData): void {
-        ctx.imports.add('import {triggeredEmails} from "wix-crm-frontend"')
+        ctx.addSpecificImport('triggeredEmails', 'wix-crm-frontend')
         ctx.write('triggeredEmails.' + (data.isMember ? 'emailMember' : 'emailContact') + '(')
         ctx.writeProperty(data.email)
         ctx.write(', ')
@@ -135,7 +135,7 @@ export class CreateContact extends ComputationBlock<CreateContactData> {
     color: string = 'bg-yellow-600'
 
     compile(ctx: Compiler, data: CreateContactData): void {
-        ctx.imports.add('import {contacts} from "wix-crm-frontend"')
+        ctx.addSpecificImport('contacts', 'wix-crm-frontend')
         ctx.isAsync = true
         ctx.write('(await contacts.appendOrCreateContact(')
         ctx.writeJsonObject({

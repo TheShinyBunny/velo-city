@@ -3,9 +3,15 @@ import type {ExpressionType} from '~/utils/types'
 import {EventBlockType} from '~/utils/events'
 import {isPropertyWithValue} from '~/utils/helpers'
 
+export interface Import {
+    from: string
+    importAll?: string
+    imports: string[]
+}
+
 export class Compiler {
     lines: string[] = []
-    imports: Set<string> = new Set<string>()
+    imports: Import[] = []
     functions: string[] = []
     onReady: string[] = []
     indentation: number = 0
@@ -41,6 +47,34 @@ export class Compiler {
         this.write('  ')
         action()
         this.indentation -= 2
+    }
+
+    addImportAll(alias: string, from: string) {
+        const imp = this.imports.find(i => i.from === from)
+        if (imp) {
+            if (imp.importAll && imp.importAll !== alias) {
+                throw 'Multiple all-imports of ' + from + ' with a different alias'
+            }
+            imp.importAll = alias
+        } else {
+            this.imports.push({
+                from,
+                importAll: alias,
+                imports: []
+            })
+        }
+    }
+
+    addSpecificImport(property: string, from: string) {
+        const imp = this.imports.find(i => i.from === from)
+        if (imp) {
+            imp.imports.push(property)
+        } else {
+            this.imports.push({
+                from,
+                imports: [property]
+            })
+        }
     }
 
     writeProperty(prop: Property, required = true) {
@@ -110,11 +144,26 @@ export class Compiler {
 
     createOutput() {
         let output = ''
-        this.imports.forEach(imp => output += imp + '\n')
+        this.imports.forEach(imp => output += this.stringifyImport(imp) + '\n')
         output += '$w.onReady(async () => {'
         this.onReady.forEach(line => output += '\n  ' + line)
         output += '\n}'
         return output
+    }
+
+    private stringifyImport(imp: Import) {
+        let result = 'import '
+        if (imp.importAll) {
+            result += imp.importAll
+            if (imp.imports.length > 0) {
+                result += ', '
+            }
+        }
+        if (imp.imports.length > 0) {
+            result += '{' + imp.imports.join(', ') + '}'
+        }
+        result += ' from "' + imp.from + '"'
+        return result
     }
 
     writeJsonObject(obj: any) {
