@@ -15,6 +15,7 @@ let compilationResults = ref('')
 const dragState = useDragState()
 const blocks = useEditorBlocks()
 const saveStatus = useSaveState()
+const { metaSymbol } = useShortcuts()
 
 function deleteDragged() {
     if (dragState.value.draggedBlocks) {
@@ -33,7 +34,11 @@ function compile() {
 
 const {saveProject} = inject('projectActions')
 
-const fileMenu: DropdownItem[][] = [
+defineShortcuts({
+    meta_s: () => saveProject()
+})
+
+const fileMenu = computed<DropdownItem[][]>(() => [
     [
         {
             label: 'New...'
@@ -49,6 +54,7 @@ const fileMenu: DropdownItem[][] = [
     [
         {
             label: 'Save',
+            shortcuts: [metaSymbol.value, 'S'],
             click: () => saveProject()
         },
         {
@@ -60,7 +66,7 @@ const fileMenu: DropdownItem[][] = [
             click: () => deleteModal.value = true
         }
     ]
-]
+])
 
 </script>
 <template>
@@ -84,7 +90,7 @@ const fileMenu: DropdownItem[][] = [
 </template>
 <style scoped lang="scss">
 .navbar {
-    @apply fixed flex items-center gap-5 top-0 h-16 z-50 w-full bg-blue-400 shadow-lg shadow-gray-400;
+    @apply fixed flex items-center gap-5 top-0 h-16 z-50 w-full bg-blue-400 shadow-lg shadow-gray-400 px-3;
 }
 
 .logo {

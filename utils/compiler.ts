@@ -145,7 +145,7 @@ export class Compiler {
     createOutput() {
         let output = ''
         this.imports.forEach(imp => output += this.stringifyImport(imp) + '\n')
-        output += '$w.onReady(async () => {'
+        output += '\n$w.onReady(async () => {'
         this.onReady.forEach(line => output += '\n  ' + line)
         output += '\n}'
         return output

@@ -123,7 +123,7 @@ export class CallableBlock extends ComputationBlock<CallableData> {
             if (data.params) {
                 let first = true
                 for (let param of data.params) {
-                    if (!param.optional) {
+                    if (!param.optional || param.value) {
                         if (!first) {
                             ctx.write(', ')
                         }
@@ -200,11 +200,13 @@ export class MultiCallableBlock extends ComputationBlock<MultiCallableData> {
         if (data.selected.params) {
             let first = true
             for (let param of data.selected.params) {
-                if (!first) {
-                    ctx.write(', ')
+                if (!param.optional || param.value) {
+                    if (!first) {
+                        ctx.write(', ')
+                    }
+                    ctx.writeProperty(param)
+                    first = false
                 }
-                ctx.writeProperty(param)
-                first = false
             }
         }
         ctx.write(')')

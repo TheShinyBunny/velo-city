@@ -5,42 +5,42 @@ import {buttons} from '~/utils/velo/buttons'
 import {crm} from '~/utils/velo/crm'
 
 export interface BlockCategory {
-    name: string
+    label: string
     blocks: Block[]
 }
 
 export function getCategories(): BlockCategory[] {
     return [
         {
-            name: 'Control',
+            label: 'Control',
             blocks: control()
         },
         {
-            name: 'Events',
+            label: 'Events',
             blocks: events()
         },
         {
-            name: 'Logic',
+            label: 'Logic',
             blocks: logic
         },
         {
-            name: 'String',
+            label: 'String',
             blocks: strings()
         },
         {
-            name: 'Elements',
+            label: 'Elements',
             blocks: elements()
         },
         {
-            name: 'Buttons',
+            label: 'Buttons',
             blocks: buttons()
         },
         {
-            name: 'Inputs',
+            label: 'Inputs',
             blocks: inputs()
         },
         {
-            name: 'CRM',
+            label: 'CRM',
             blocks: crm()
         }
     ]

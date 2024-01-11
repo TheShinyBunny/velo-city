@@ -12,7 +12,8 @@ const selected = ref<SelectOption | undefined>(value ? options.find(option => op
 
 <template>
     <div @mousedown.stop>
-        <USelectMenu :model-value="selected" @change="$emit('changed', $event)" :options="options" :placeholder="placeholder" by="value" value-attribute="value" :popper="{placement: 'bottom-start'}" />
+        <USelectMenu :model-value="selected" @change="$emit('changed', $event)" :options="options"
+                     :placeholder="placeholder" by="value" value-attribute="value" :popper="{placement: 'bottom-start'}" />
     </div>
 </template>
 
