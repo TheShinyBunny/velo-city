@@ -1,30 +1,3 @@
-.btn {
-    @apply px-4 py-2 m-3 justify-center flex items-center gap-2;
-
-    &:disabled {
-        @apply opacity-30;
-    }
-}
-
-.btn-primary {
-    @apply bg-blue-500 hover:bg-blue-600 transition-colors text-white rounded-full min-w-[8rem];
-}
-
-.btn-secondary {
-    @apply bg-gray-300 hover:bg-gray-400 transition-colors text-black rounded-full min-w-[8rem];
-}
-
-.btn-icon {
-    @apply rounded-full p-0 m-1;
-}
-
-.btn-success {
-    @apply bg-green-500 hover:bg-green-400 transition-colors text-white border-2 border-green-600 rounded-md;
-}
-
-.btn-danger {
-    @apply bg-red-500 hover:bg-red-400 transition-colors text-white border-2 border-red-600 rounded-full min-w-[8rem];
-}
 
 .title {
     @apply text-4xl text-center;
@@ -36,30 +9,6 @@
 
 .input {
     @apply px-3 py-1 h-8 inline-block rounded-md outline-none border border-gray-400 bg-white focus:outline-1 focus:outline-cyan-300 max-w-[20rem];
-}
-
-.menu-button {
-    @apply rounded-md bg-black bg-opacity-10 px-4 py-2 text-gray-700 hover:bg-opacity-20 cursor-pointer flex gap-2 items-center;
-}
-
-.menu-button-round {
-    @apply rounded-full bg-black bg-opacity-10 p-1 text-gray-700 hover:bg-opacity-20 cursor-pointer flex items-center;
-}
-
-.menu-item {
-    @apply w-full flex items-center rounded-md p-2 text-black;
-}
-
-.menu-items {
-    @apply absolute right-0 w-56 origin-top-right divide-y divide-gray-100 rounded-md bg-white shadow-lg z-20;
-
-    &.right {
-        @apply left-0 right-auto;
-    }
-}
-
-.menu-item-active {
-    @apply bg-gray-200;
 }
 
 .drop-zone {
@@ -74,16 +23,8 @@
     }
 }
 
-.modal-content {
-    @apply w-full max-w-md transform rounded-2xl bg-white text-left align-middle shadow-xl transition-all;
-}
-
-.modal-scroll-area {
-    @apply overflow-y-auto m-1 px-4 py-4 max-h-[78vh];
-}
-
-.modal-lg .modal-content {
-    @apply max-w-3xl;
+.modal-lg {
+    @apply min-w-80 max-w-3xl;
 }
 
 ::-webkit-scrollbar-track {

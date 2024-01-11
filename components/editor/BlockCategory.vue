@@ -2,7 +2,7 @@
 import type {BlockCategory} from '~/utils/palette'
 import {type Block} from '~/utils/blocks'
 
-const {category, isOpen} = defineProps<{category: BlockCategory, isOpen: boolean}>()
+const {category} = defineProps<{category: BlockCategory}>()
 defineEmits(['selected'])
 
 const dragState = useDragState()
@@ -21,20 +21,10 @@ provide('isTemplate', true)
 </script>
 <template>
     <div class="grid gap-2 px-1">
-        <div class="category-title" @click="$emit('selected')">
-            <span>{{ category.name }}</span>
-            <Icon :name="isOpen ? 'mdi:chevron-up' : 'mdi:chevron-down'" />
-        </div>
-        <div v-if="isOpen" class="category-blocks">
-            <EditorBlockRender v-for="block in category.blocks" :key="block" :block="block" @start-dragging="startDragging($event, block)" />
-        </div>
+        <EditorBlockRender v-for="block in category.blocks" :key="block" :block="block" @start-dragging="startDragging($event, block)" />
     </div>
 </template>
 <style scoped lang="scss">
-.category-title {
-    @apply text-xl py-2 cursor-pointer flex justify-between items-center;
-}
-
 .category-blocks {
     @apply grid gap-3;
 }

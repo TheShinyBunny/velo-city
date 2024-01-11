@@ -14,7 +14,7 @@ async function createProject() {
 <template>
     <div class="project-list">
         <div class="card new-project" @click="createProject()">
-            <Icon name="ic:outline-add" />
+            <UIcon name="i-mdi-add" />
             <p>Create New Project</p>
         </div>
         <NuxtLink v-for="project in projects" class="card" :to="`/editor/blocks/${project.id}`">

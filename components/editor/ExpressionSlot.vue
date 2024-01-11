@@ -117,15 +117,15 @@ function validateInput(event: InputEvent) {
                            @changed="setPropertyValue($event)" />
         <EditorSelectInput v-else-if="typeKey === 'enum'" :value="stringVal" :options="property.type['options']"
                            @changed="setPropertyValue($event)" :placeholder="property.label" />
-        <input v-else-if="property.type === 'color'" :value="stringVal" type="color" class="input cursor-pointer !p-0 color-input"
-               @input="setPropertyValue($event.target.value)" />
+        <UInput v-else-if="property.type === 'color'" :model-value="stringVal" type="color" class="cursor-pointer"
+               @update:model-value="setPropertyValue($event)" :padded="false" input-class="color-input" />
         <span v-else class="input text-black" :contenteditable="isStringLike && !isTemplate"
               :class="{placeholder: !stringVal?.length, 'can-attach': canAttach}"
               :data-label="property.label" @input="validateInput($event)" >
             {{stringVal}}
         </span>
         <span class="right-icon" v-if="stringVal.length && typeKey === 'number' && singleType['suffix']">{{singleType['suffix']}}</span>
-        <Icon class="right-icon" v-else-if="stringVal.length && typeKey === 'number'" name="mdi:pound" />
+        <UIcon class="right-icon" v-else-if="stringVal.length && typeKey === 'number'" name="mdi:pound" />
     </span>
 </template>
 <style scoped lang="scss">
@@ -138,16 +138,16 @@ function validateInput(event: InputEvent) {
     @apply bg-gray-200 border-gray-600;
 }
 
-.color-input {
-    @apply translate-y-1;
-}
+:deep(.color-input) {
+    @apply w-12 cursor-pointer;
 
-.color-input::-webkit-color-swatch {
-    @apply rounded-md;
-}
+    &::-webkit-color-swatch {
+        @apply rounded-md;
+    }
 
-.color-input::-webkit-color-swatch-wrapper {
-    @apply p-0;
+    &::-webkit-color-swatch-wrapper {
+        @apply p-0;
+    }
 }
 
 .input-container:has(.right-icon) .input {

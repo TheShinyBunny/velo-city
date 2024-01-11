@@ -98,7 +98,7 @@ function selectionChanged(piece: SelectionPiece<any>, selected: string) {
 </template>
 <style scoped lang="scss">
 .normal-piece {
-    @apply p-2 w-fit max-w-lg gap-1 flex flex-wrap items-center text-white cursor-move select-none relative border-2
+    @apply p-2 w-fit max-w-lg gap-1 flex flex-wrap items-center text-white cursor-move select-none relative border
     border-black border-opacity-25 pointer-events-auto;
 }
 

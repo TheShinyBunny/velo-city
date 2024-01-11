@@ -3,7 +3,7 @@ import {defineNuxtConfig} from 'nuxt/config'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@sidebase/nuxt-auth', '@nuxtjs/tailwindcss', 'nuxt-icon', 'nuxt-headlessui'],
+  modules: ['@sidebase/nuxt-auth', '@nuxt/ui'],
   postcss: {
     plugins: {
       tailwindcss: {},
@@ -11,7 +11,11 @@ export default defineNuxtConfig({
     }
   },
   css: ['~/assets/main.scss'],
-  headlessui: {
-    prefix: ''
+  ui: {
+    icons: ['mdi', 'heroicons'],
+    global: true,
+  },
+  colorMode: {
+    preference: 'light'
   }
 })
