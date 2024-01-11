@@ -9,6 +9,7 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
+    "@highlightjs/vue-plugin": "^2.1.0",
     "@iconify-json/mdi": "^1.1.64",
     "@next-auth/prisma-adapter": "^1.0.7",
     "@nuxt/devtools": "latest",
@@ -16,6 +17,7 @@
     "@nuxtjs/tailwindcss": "^6.7.2",
     "@sidebase/nuxt-auth": "^0.6.3",
     "@types/node": "^18",
+    "highlight.js": "^11.9.0",
     "next-auth": "4.22.5",
     "nuxt": "^3.9.0",
     "nuxt-icon": "^0.4.1",

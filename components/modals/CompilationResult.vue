@@ -1,6 +1,17 @@
 <script setup lang="ts">
 const {open, results} = defineProps<{open: boolean, results: string}>()
 defineEmits(['update:open'])
+
+const copied = ref(false)
+
+function copyCode() {
+    copied.value = true
+    navigator.clipboard.writeText(results)
+    setTimeout(() => {
+        copied.value = false
+    }, 1500)
+}
+
 </script>
 
 <template>
@@ -16,8 +27,13 @@ defineEmits(['update:open'])
                     <UIcon class="cursor-pointer" name="i-mdi-help-circle-outline" />
                 </UTooltip>
             </p>
-            <pre class="border border-gray-400 rounded-md font-mono p-3 mt-3 h-80 overflow-auto">{{results}}</pre>
+            <ClientOnly>
+                <highlightjs class="border border-gray-400 rounded-md mt-3 h-96 overflow-auto" language="javascript" :code="results"/>
+            </ClientOnly>
             <div class="centered-items mt-3">
+                <UButton size="lg" color="primary" @click="copyCode()" :disabled="copied" :icon="copied ? 'i-mdi-check' : 'i-mdi-clipboard-outline'">
+                    {{copied ? 'Copied!' : 'Copy Code'}}
+                </UButton>
                 <UButton size="lg" color="black" @click="$emit('update:open', false)">Close</UButton>
             </div>
         </UCard>
