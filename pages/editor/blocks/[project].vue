@@ -96,7 +96,7 @@ async function tryAttachBlocks() {
         const beforeAttachment = blocks[index - 1]
         const afterAttachment = blocks[index]
         const topDragged = dragState.value.draggedBlocks!.blocks[0]
-        const bottomDragged = dragState.value.draggedBlocks!.blocks.at(-1)
+        const bottomDragged = dragState.value.draggedBlocks!.blocks.at(-1)!
         if ((!beforeAttachment || (await canBlockConnectBottom(beforeAttachment) && await canBlockConnectTop(topDragged))) &&
             (!afterAttachment || (await canBlockConnectTop(afterAttachment) && await canBlockConnectBottom(bottomDragged))) &&
             (blocks.length || await canBlockConnectTop(topDragged))) {

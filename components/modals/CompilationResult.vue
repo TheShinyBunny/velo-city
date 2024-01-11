@@ -7,7 +7,7 @@ defineEmits(['update:open'])
     <Modal class="modal-lg" :open="open" @update:open="$emit('update:open', $event)">
         <h2 class="text-2xl text-center">Your Code is Ready!</h2>
         <p>
-            Paste the following code in your Page's Code section
+            Paste the following code in your page's Velo Code section
             <Tooltip text="Show Me Where">
                 <Icon class="cursor-pointer text-primary" name="mdi:help-circle-outline" />
             </Tooltip>

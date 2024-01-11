@@ -32,7 +32,7 @@ export class ElementEvent extends EventBlockType<EventData> {
     }
     compile(ctx: Compiler, data: EventData) {
         ctx.writeProperty(data.element)
-        ctx.writeLine('.' + data.key + '(() => ' + '{')
+        ctx.writeLine('.' + data.key + '(' + (ctx.isAsync ? 'async ' : '') + '() => ' + '{')
         ctx.indent(() => {
             ctx.writeAll(ctx.eventContent)
         })

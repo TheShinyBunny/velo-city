@@ -18,6 +18,14 @@ export function crm(): Block[] {
                 target: createProp('Contact ID', 'string'),
                 variables: []
             }
+        },
+        {
+            type: 'createContact', data: {
+                firstName: createProp('First Name', 'string'),
+                lastName: createProp('Last Name', 'string'),
+                email: createProp('Email', 'string'),
+                phone: createProp('Phone', 'string'),
+            }
         }
     ]
 }
@@ -46,7 +54,9 @@ export class SendTriggeredEmail extends ComputationBlock<TriggeredEmailData> {
             ]))
         ]
     }
+
     compile(ctx: Compiler, data: TriggeredEmailData): void {
+        ctx.imports.add('import {triggeredEmails} from "wix-crm-frontend"')
         ctx.write('triggeredEmails.' + (data.isMember ? 'emailMember' : 'emailContact') + '(')
         ctx.writeProperty(data.email)
         ctx.write(', ')
@@ -122,16 +132,33 @@ interface CreateContactData {
 }
 
 export class CreateContact extends ComputationBlock<CreateContactData> {
-    color: string = 'bg-yellow-500'
+    color: string = 'bg-yellow-600'
 
     compile(ctx: Compiler, data: CreateContactData): void {
+        ctx.imports.add('import {contacts} from "wix-crm-frontend"')
+        ctx.isAsync = true
+        ctx.write('(await contacts.appendOrCreateContact(')
+        ctx.writeJsonObject({
+            name: {
+                first: data.firstName,
+                last: data.lastName
+            },
+            emails: [{email: data.email}],
+            phones: [{phone: data.phone}]
+        })
+        ctx.write(')).contactId')
     }
 
     getResultType(data: CreateContactData): ExpressionType {
-        return {type: 'promise', of: 'string'}
+        return 'string'
     }
 
     render(data: CreateContactData): BlockPiece<CreateContactData>[] {
-        return []
+        return ['Create or Update Contact', '\n',
+            'First Name:', data.firstName, '\n',
+            'Last Name:', data.lastName, '\n',
+            'Email:', data.email, '\n',
+            'Phone:', data.phone,
+        ]
     }
 }

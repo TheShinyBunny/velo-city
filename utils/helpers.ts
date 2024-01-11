@@ -102,3 +102,11 @@ export function toTitleCase(str: string) {
     const result = str.replace(/([A-Z])/g, ' $1')
     return result.charAt(0).toUpperCase() + result.slice(1)
 }
+
+export function isProperty(value: any): value is Property {
+    return value.label && value.type
+}
+
+export function isPropertyWithValue(value: any): value is Property {
+    return value.label && value.type && value.value
+}

@@ -95,6 +95,7 @@ export async function createRegistry() {
         fieldSetter: new fields.FieldSetterBlock(),
         multiFieldSetter: new fields.MultiFieldSetterBlock(),
         sendTriggeredEmail: new crm.SendTriggeredEmail(),
+        createContact: new crm.CreateContact(),
         error: new values.ErrorBlock()
     }
 }
@@ -118,8 +119,6 @@ export function getTypeNow(type: BlockTypes): BlockType<any> | undefined {
     if (!reg) return undefined
     return reg[type]
 }
-
-
 
 export type BlockTypes = keyof Awaited<ReturnType<typeof createRegistry>>
 

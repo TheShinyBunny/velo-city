@@ -1,15 +1,17 @@
 import type {Block, BlockGroup, Property} from '~/utils/blocks'
 import type {ExpressionType} from '~/utils/types'
 import {EventBlockType} from '~/utils/events'
+import {isPropertyWithValue} from '~/utils/helpers'
 
 export class Compiler {
     lines: string[] = []
-    imports: string[] = []
+    imports: Set<string> = new Set<string>()
     functions: string[] = []
     onReady: string[] = []
     indentation: number = 0
     expectedType?: ExpressionType
     eventContent: string[] = []
+    isAsync?: boolean
 
     write(str: string) {
         if (!this.lines.length) {
@@ -36,7 +38,7 @@ export class Compiler {
 
     indent(action: () => void) {
         this.indentation += 2
-        this.write(' '.repeat(this.indentation))
+        this.write('  ')
         action()
         this.indentation -= 2
     }
@@ -85,6 +87,7 @@ export class Compiler {
             this.lines = []
             getBlockTypeNow(group.blocks[0])?.compile(this, group.blocks[0].data)
             this.eventContent = []
+            this.isAsync = false
         } else {
             this.write('{')
             if (group.blocks.length) {
@@ -108,9 +111,74 @@ export class Compiler {
     createOutput() {
         let output = ''
         this.imports.forEach(imp => output += imp + '\n')
-        output += '$w.onReady(() => {'
+        output += '$w.onReady(async () => {'
         this.onReady.forEach(line => output += '\n  ' + line)
         output += '\n}'
         return output
+    }
+
+    writeJsonObject(obj: any) {
+        this.writeLine('{')
+        this.indent(() => {
+            let first = true
+            for (const [key, value] of Object.entries(obj)) {
+                if (value) {
+                    if (isPropertyWithValue(value)) {
+                        if (!first) {
+                            this.writeLine()
+                        }
+                        this.write(key + ': ')
+                        this.writeProperty(value)
+                        this.write(',')
+                        first = false
+                    } else if (Array.isArray(value)) {
+                        if (!first) {
+                            this.writeLine()
+                        }
+                        this.write(key + ': ')
+                        this.writeJsonArray(value)
+                        this.write(', ')
+                        first = false
+                    } else if (this.hasAnyProperties(value)) {
+                        if (!first) {
+                            this.writeLine()
+                        }
+                        this.write(key + ': ')
+                        this.writeJsonObject(value)
+                        this.write(', ')
+                        first = false
+                    }
+                }
+            }
+        })
+        this.writeLine()
+        this.write('}')
+    }
+
+    writeJsonArray(arr: any[]) {
+        this.write('[')
+        let first = true
+        for (const item of arr) {
+            if (item) {
+                if (isPropertyWithValue(item)) {
+                    if (!first) {
+                        this.write(', ')
+                    }
+                    this.writeProperty(item)
+                    first = false
+                } else if (this.hasAnyProperties(item)) {
+                    if (!first) {
+                        this.write(', ')
+                    }
+                    this.writeJsonObject(item)
+                    first = false
+                }
+            }
+        }
+        this.write(']')
+    }
+
+    private hasAnyProperties(obj: any) {
+        return Object.values(obj).some((value) => isPropertyWithValue(value))
     }
 }
