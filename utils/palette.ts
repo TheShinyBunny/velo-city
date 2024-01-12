@@ -3,6 +3,7 @@ import {elements} from '~/utils/velo/elements'
 import {inputs} from '~/utils/velo/inputs'
 import {buttons} from '~/utils/velo/buttons'
 import {crm} from '~/utils/velo/crm'
+import {data} from '~/utils/velo/data'
 
 export interface BlockCategory {
     label: string
@@ -42,6 +43,10 @@ export function getCategories(): BlockCategory[] {
         {
             label: 'CRM',
             blocks: crm()
+        },
+        {
+            label: 'Data',
+            blocks: data()
         }
     ]
 }

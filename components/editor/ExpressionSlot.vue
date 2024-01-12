@@ -4,6 +4,7 @@ import {type NumberType} from '~/utils/types'
 
 const {property} = defineProps<{property: Property}>()
 const isTemplate = inject('isTemplate', false)
+const currentBlock = inject('currentBlock')
 const stringVal = ref<string>('')
 const isLiteral = ref(false)
 const isStringLike = ref(false)
@@ -60,6 +61,9 @@ function startDragging(event: MouseEvent) {
         offsetY: event.clientY - rect.top
     }
     delete property.value
+    if (property.onAttachedBlockChange) {
+        currentBlock.set(property.onAttachedBlockChange(property, currentBlock.get()))
+    }
 }
 
 function isDraggingNearSlot() {
@@ -82,7 +86,9 @@ watch(canAttach, (state) => {
     if (state) {
         lastAttachment = {
             type: 'slot',
-            property
+            property,
+            parent: currentBlock.get(),
+            updateParent: (newParent) => currentBlock.set(newParent)
         }
         attach.value = lastAttachment
     } else if (attach.value && lastAttachment && lastAttachment.property == (attach.value as SlotAttachment).property) {
@@ -110,7 +116,7 @@ function validateInput(event: InputEvent) {
 
 </script>
 <template>
-    <EditorBlockRender v-if="property.value && !isLiteral" :block="property.value" @start-dragging="startDragging($event)"
+    <EditorBlockRender v-if="property.value && !isLiteral" :block="property.value!" @start-dragging="startDragging($event)"
                        @update-block="updateBlockInSlot($event)" />
     <span v-else ref="placeholder" class="relative input-container" :class="{'cursor-text': isStringLike}" @mousedown.stop>
         <EditorSelectInput v-if="property.type === 'boolean'" :value="stringVal || 'true'" :options="booleanOptions"

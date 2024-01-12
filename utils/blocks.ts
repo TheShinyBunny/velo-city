@@ -44,6 +44,8 @@ export interface Property {
     value?: Block
     optional?: boolean
     error?: string
+    canAttachBlock?: (property: Property, block: Block) => string | undefined
+    onAttachedBlockChange?: (property: Property, parent: Block) => Block
 }
 
 export interface SelectionPiece<T> {
@@ -81,6 +83,7 @@ export async function createRegistry() {
     const values = await import('./values')
     const fields = await import('./fields')
     const crm = await import('./velo/crm')
+    const data = await import('./velo/data')
     return registry = {
         ifBlock: new control.IfBlock(),
         onReady: new events.OnReady(),
@@ -96,6 +99,7 @@ export async function createRegistry() {
         multiFieldSetter: new fields.MultiFieldSetterBlock(),
         sendTriggeredEmail: new crm.SendTriggeredEmail(),
         createContact: new crm.CreateContact(),
+        createFilter: new data.CreateFilter(),
         error: new values.ErrorBlock()
     }
 }
@@ -136,4 +140,6 @@ export interface AdjacentAttachment extends AttachTarget {
 export interface SlotAttachment extends AttachTarget {
     type: 'slot'
     property: Property
+    parent: Block
+    updateParent: (newParent: Block) => void
 }

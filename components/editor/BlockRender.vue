@@ -7,6 +7,10 @@ const emit = defineEmits(['startDragging', 'attachChanged', 'updateBlock'])
 let type = await getBlockType(props.block)
 let groups = ref<BlockPiece<any>[][]>([])
 const renderedBlock = ref<Block>(props.block)
+provide('currentBlock', {
+    get: () => renderedBlock.value,
+    set: (newBlock) => emit('updateBlock', newBlock)
+})
 
 onMounted(() => {
     updateRender()
