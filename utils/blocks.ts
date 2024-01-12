@@ -52,7 +52,8 @@ export interface SelectionPiece<T> {
     placeholder?: string
     value?: string
     options: SelectOption[]
-    onChange?(value: string, block: Block<T>): Block<T>
+    largeLabels?: boolean
+    onChange?: (value: string, block: Block<T>) => Block<T>
 }
 
 export interface SelectOption {

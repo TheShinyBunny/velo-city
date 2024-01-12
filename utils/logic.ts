@@ -1,20 +1,68 @@
-import {type Block, type BlockAction, type BlockPiece, ExpressionBlock, type Property} from './blocks'
+import {
+    type Block,
+    type BlockAction,
+    type BlockPiece,
+    ExpressionBlock,
+    type Property,
+    type SelectOption
+} from './blocks'
 import {Compiler} from './compiler'
 import type {ExpressionType} from '~/utils/types'
+
+interface Operand extends SelectOption {
+    value: string
+    label: string
+    opposite: string
+}
+
+const operands: Operand[] = [
+    {
+        value: '>',
+        label: '>',
+        opposite: '<'
+    },
+    {
+        value: '>=',
+        label: '≥',
+        opposite: '<='
+    },
+    {
+        value: '<',
+        label: '<',
+        opposite: '>'
+    },
+    {
+        value: '<=',
+        label: '≤',
+        opposite: '>='
+    },
+    {
+        value: '==',
+        label: '=',
+        opposite: '!='
+    },
+    {
+        value: '!=',
+        label: '≠',
+        opposite: '=='
+    }
+]
 
 interface ComparisonData {
   left: Property
   right: Property
-  operand: string
-  label: string
-  opposite: string
+  operand: Operand
 }
 
 export class Comparison extends ExpressionBlock<ComparisonData> {
     color: string = 'bg-green-400'
 
     render(data: ComparisonData): BlockPiece<ComparisonData>[] {
-        return [data.left, data.label, data.right]
+        return [data.left, {options: operands, value: data.operand.value, largeLabels: true, onChange: (value, block) => {
+            return withData(block, {
+                operand: operands.find(op => op.value === value)
+            })
+        }}, data.right]
     }
     getResultType(data: ComparisonData): ExpressionType {
         return 'boolean'
@@ -27,7 +75,7 @@ export class Comparison extends ExpressionBlock<ComparisonData> {
         } else {
             ctx.writeProperty(data.left)
         }
-        ctx.write(' ' + data.operand + ' ')
+        ctx.write(' ' + data.operand.value + ' ')
         if (data.right.value?.type === 'comparison') {
             ctx.write('(')
             ctx.writeProperty(data.right)
@@ -36,41 +84,29 @@ export class Comparison extends ExpressionBlock<ComparisonData> {
             ctx.writeProperty(data.right)
         }
     }
-    getActions(): BlockAction<ComparisonData>[] {
+    getActions(data: ComparisonData): BlockAction<ComparisonData>[] {
         return [
             {
                 label: 'Swap Left & Right',
                 run(ctx, block) {
-                    return withData(block, {left: block.data!.right, right: block.data!.left})
+                    return withData(block, {
+                        left: {...block.data!.left, value: block.data!.right.value},
+                        right: {...block.data!.right, value: block.data!.left.value}
+                    })
                 }
             },
             {
                 label: 'Negate',
                 run(ctx, block) {
-                    let oppositeData = (comparisons as Record<string, ComparisonData>)[block.data!.opposite]
+                    let opposite = operands.find(op => op.value === data.operand.opposite)
                     return withData(block, {
-                        label: oppositeData.label,
-                        operand: oppositeData.operand,
-                        opposite: oppositeData.opposite
+                        operand: opposite
                     })
                 }
             }
         ]
     }
 }
-
-function createComparison(operand: string, label: string, opposite: string): ComparisonData {
-  return {operand, label, left: {label: 'Value', type: 'any'}, right: {label: 'Value', type: 'any'}, opposite}
-}
-
-export const comparisons = {
-  equals: createComparison('==', 'is', 'notEqual'),
-  notEqual: createComparison('!=', 'is not', 'equals'),
-  lessThan: createComparison('<', 'is less than', 'greaterOrEqual'),
-  greaterThan: createComparison('>', 'is greater than', 'lessOrEqual'),
-  lessOrEqual: createComparison('<=', 'is less or equal to', 'greaterThan'),
-  greaterOrEqual: createComparison('>=', 'is greater or equal to', 'lessThan'),
-} satisfies Record<string, ComparisonData>
 
 export interface UnaryData {
     value: Property
@@ -101,11 +137,6 @@ export class UnaryOperation extends ExpressionBlock<UnaryData> {
 }
 
 export const logic: Block[] = [
-    {type: 'comparison', data: comparisons.equals},
-    {type: 'comparison', data: comparisons.notEqual},
-    {type: 'comparison', data: comparisons.lessThan},
-    {type: 'comparison', data: comparisons.greaterThan},
-    {type: 'comparison', data: comparisons.lessOrEqual},
-    {type: 'comparison', data: comparisons.greaterOrEqual},
+    {type: 'comparison', data: {operand: operands[0], left: createProp('Left', 'any'), right: createProp('Right', 'any')}},
     {type: 'unary', data: {value: {label: 'Value', type: 'any'}, label: 'Not', operand: '!', resultType: 'boolean'}},
 ]
