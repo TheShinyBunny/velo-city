@@ -11,6 +11,7 @@ const isStringLike = ref(false)
 const singleType = asSingleType(property.type)
 const typeKey = getTypeKey(singleType)
 const placeholder = ref<HTMLElement>()
+const tooltip = ref('')
 
 onMounted(() => {
     if (property.value?.type === 'literal') {
@@ -69,9 +70,28 @@ function startDragging(event: MouseEvent) {
 function isDraggingNearSlot() {
     if (!dragState.value.draggedBlocks) return false
     if (!placeholder.value) return false
+    if (dragState.value.draggedBlocks.blocks.length > 1) return false
+    if (!isExpression(getBlockTypeNow(dragState.value.draggedBlocks.blocks![0])!)) return false
     const rect = placeholder.value!.getBoundingClientRect();
-    return isBetween(rect.top, mousePos.value.y - dragState.value.offsetY, rect.bottom)
+    const isNear = isBetween(rect.top, mousePos.value.y - dragState.value.offsetY, rect.bottom)
         && isBetween(rect.left, mousePos.value.x - dragState.value.offsetX, rect.right)
+    tooltip.value = ''
+    if (!isNear) return false
+    if (property.canAttachBlock) {
+        const message = property.canAttachBlock(property, dragState.value.draggedBlocks!.blocks[0])
+        if (message) {
+            tooltip.value = message
+            return false
+        }
+    } else if (typeKey !== 'any') {
+        const resultType = getResultType(dragState.value.draggedBlocks!.blocks[0])
+        if (!canAssignTypes(resultType, property.type)) {
+            tooltip.value = 'A block that returns ' + getTypeName(resultType) + ' cannot be inserted to a slot accepting ' + getTypeName(property.type)
+            return false
+        }
+    }
+    tooltip.value = ''
+    return true
 }
 
 function isBetween(min: number, value: number, max: number) {
@@ -118,21 +138,26 @@ function validateInput(event: InputEvent) {
 <template>
     <EditorBlockRender v-if="property.value && !isLiteral" :block="property.value!" @start-dragging="startDragging($event)"
                        @update-block="updateBlockInSlot($event)" />
-    <span v-else ref="placeholder" class="relative input-container" :class="{'cursor-text': isStringLike}" @mousedown.stop>
-        <EditorSelectInput v-if="property.type === 'boolean'" :value="stringVal || 'true'" :options="booleanOptions"
-                           @changed="setPropertyValue($event)" />
-        <EditorSelectInput v-else-if="typeKey === 'enum'" :value="stringVal" :options="property.type['options']"
-                           @changed="setPropertyValue($event)" :placeholder="property.label" />
-        <UInput v-else-if="property.type === 'color'" :model-value="stringVal" type="color" class="cursor-pointer"
-               @update:model-value="setPropertyValue($event)" :padded="false" input-class="color-input" />
-        <span v-else class="input text-black" :contenteditable="isStringLike && !isTemplate"
-              :class="{placeholder: !stringVal?.length, 'can-attach': canAttach}"
-              :data-label="property.label" @input="validateInput($event)" >
-            {{stringVal}}
+    <UPopover v-else :open="!!tooltip.length" :popper="{placement: 'top'}">
+        <span ref="placeholder" class="relative input-container" :class="{'cursor-text': isStringLike}" @mousedown.stop>
+            <EditorSelectInput v-if="property.type === 'boolean'" :value="stringVal || 'true'" :options="booleanOptions"
+                               @changed="setPropertyValue($event)" />
+            <EditorSelectInput v-else-if="typeKey === 'enum'" :value="stringVal" :options="property.type['options']"
+                               @changed="setPropertyValue($event)" :placeholder="property.label" />
+            <UInput v-else-if="property.type === 'color'" :model-value="stringVal" type="color" class="cursor-pointer"
+                    @update:model-value="setPropertyValue($event)" :padded="false" input-class="color-input" />
+            <span v-else class="input text-black" :contenteditable="isStringLike && !isTemplate" spellcheck="false"
+                  :class="{placeholder: !stringVal?.length, 'can-attach': canAttach}"
+                  :data-label="property.label" @input="validateInput($event)" >
+                {{stringVal}}
+            </span>
+            <span class="right-icon" v-if="stringVal.length && typeKey === 'number' && singleType['suffix']">{{singleType['suffix']}}</span>
+            <UIcon class="right-icon" v-else-if="stringVal.length && typeKey === 'number'" name="mdi:pound" />
         </span>
-        <span class="right-icon" v-if="stringVal.length && typeKey === 'number' && singleType['suffix']">{{singleType['suffix']}}</span>
-        <UIcon class="right-icon" v-else-if="stringVal.length && typeKey === 'number'" name="mdi:pound" />
-    </span>
+        <template #panel>
+            <p class="text-black max-w-60 m-2">{{tooltip}}</p>
+        </template>
+    </UPopover>
 </template>
 <style scoped lang="scss">
 .placeholder:before {

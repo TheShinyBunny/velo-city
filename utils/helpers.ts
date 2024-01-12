@@ -91,6 +91,14 @@ export async function isBlockExpression<T>(block: Block<T>): Promise<boolean> {
     return type instanceof ExpressionBlock
 }
 
+export function getResultType(block: Block): ExpressionType {
+    const type = getBlockTypeNow(block)
+    if (type instanceof ExpressionBlock) {
+        return type.getResultType(block.data)
+    }
+    return 'void'
+}
+
 export function addIf<T>(condition: boolean, ...values: T[]): T[] {
     if (condition) {
         return values

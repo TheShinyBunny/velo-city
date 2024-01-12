@@ -54,6 +54,7 @@ export interface DateType extends ComplexType {
 
 export interface EnumType extends ComplexType {
     type: 'enum'
+    name: string
     options: SelectOption[]
 }
 
@@ -64,6 +65,7 @@ export interface ArrayType extends ComplexType {
 
 export interface ObjectType extends ComplexType {
     type: 'object'
+    name: string
     entries: Record<string, ExpressionType>
 }
 
@@ -99,4 +101,47 @@ export function getTypeKey(type: SingleType): TypeKey {
 export function asSingleType(type: ExpressionType): SingleType {
     if (Array.isArray(type)) return asSingleType(type[0])
     return type as SingleType
+}
+
+type ComplexKeyToType = {
+    string: 'string ' | StringType
+    number: 'number' | NumberType
+    date: 'date' | DateType
+    enum: EnumType
+    array: ArrayType
+    object: ObjectType
+    promise: PromiseType
+}
+
+type TypeNameMap = {
+    [T in TypeKey]: T extends keyof ComplexKeyToType ? ((complex: ComplexKeyToType[T]) => string) : string
+}
+
+const typeNames: TypeNameMap = {
+    any: 'Any Value',
+    boolean: 'Boolean',
+    color: 'Color',
+    element: 'Wix Element',
+    link: 'Link',
+    image: 'Image',
+    void: 'Nothing',
+    string: (str: string | StringType) => 'Text',
+    number: (num: string | NumberType) => typeof num !== 'string' && num.integer ? 'Whole Number' : 'Number',
+    date: (date: string | DateType) => 'Date',
+    enum: (en: EnumType) => en.name,
+    array: (arr: ArrayType) => 'Array of ' + getTypeName(arr.elements),
+    object: (obj: ObjectType) => obj.name,
+    promise: (promise: PromiseType) => 'Async Operation resulting in ' + getTypeName(promise.of)
+}
+
+export function getTypeName(type: ExpressionType): string {
+    if (Array.isArray(type)) {
+        return type.map(subType => getTypeName(subType)).join(' or ')
+    }
+    const key = getTypeKey(type as SingleType)
+    const name = typeNames[key]
+    if (typeof name === 'function') {
+        return name(type as any)
+    }
+    return name
 }
