@@ -3,7 +3,7 @@ import {defineNuxtConfig} from 'nuxt/config'
 
 export default defineNuxtConfig({
   devtools: { enabled: true },
-  modules: ['@sidebase/nuxt-auth', '@nuxt/ui'],
+  modules: ['@sidebase/nuxt-auth', '@nuxt/ui', 'nuxt-lodash'],
   postcss: {
     plugins: {
       tailwindcss: {},

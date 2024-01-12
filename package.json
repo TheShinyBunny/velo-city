@@ -21,6 +21,7 @@
     "next-auth": "4.22.5",
     "nuxt": "^3.9.0",
     "nuxt-icon": "^0.4.1",
+    "nuxt-lodash": "^2.5.3",
     "prisma": "^4.15.0",
     "sass": "^1.63.4",
     "sass-loader": "^13.3.2"

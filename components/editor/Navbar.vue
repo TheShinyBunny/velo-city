@@ -32,10 +32,14 @@ function compile() {
     resultsModal.value = true
 }
 
-const {saveProject} = inject('projectActions')
+const {saveProject, duplicateDragged} = inject('projectActions')
 
 defineShortcuts({
-    meta_s: () => saveProject()
+    meta_s: () => saveProject(),
+    meta_d: {
+        handler: () => duplicateDragged(),
+        whenever: [() => !!dragState.value.draggedBlocks]
+    }
 })
 
 const fileMenu = computed<DropdownItem[][]>(() => [
@@ -68,12 +72,42 @@ const fileMenu = computed<DropdownItem[][]>(() => [
     ]
 ])
 
+const blocksMenu = computed<DropdownItem[][]>(() => [
+    [
+        {
+            label: 'Copy',
+            shortcuts: [metaSymbol.value, 'C']
+        },
+        {
+            label: 'Paste',
+            shortcuts: [metaSymbol.value, 'V']
+        },
+        {
+            label: 'Duplicate',
+            shortcuts: [metaSymbol.value, 'D'],
+            click: () => duplicateDragged(),
+            disabled: !dragState.value.draggedBlocks
+        }
+    ],
+    [
+        {
+            label: 'Create Custom Block'
+        },
+        {
+            label: 'My Custom Blocks'
+        }
+    ]
+])
+
 </script>
 <template>
     <div class="navbar" @mouseup.left="deleteDragged()">
         <NuxtLink to="/dashboard"><h1 class="logo"><VeloLogo />City <span>Editor</span></h1></NuxtLink>
         <UDropdown :items="fileMenu" :popper="{placement: 'bottom-start'}">
             <UButton size="lg" color="white" label="File" />
+        </UDropdown>
+        <UDropdown :items="blocksMenu" :popper="{placement: 'bottom-start'}">
+            <UButton size="lg" color="white" label="Blocks" />
         </UDropdown>
         <div class="flex-grow"></div>
         <h2 class="text-3xl">{{ project.name }}</h2>

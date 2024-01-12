@@ -10,7 +10,7 @@ const dragState = useDragState()
 function startDragging(event: MouseEvent, block: Block) {
     let rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
     dragState.value = {
-        draggedBlocks: createSingleGroup(block),
+        draggedBlocks: {blocks: [useCloneDeep(block)]},
         offsetX: event.clientX - rect.left,
         offsetY: event.clientY - rect.top
     }

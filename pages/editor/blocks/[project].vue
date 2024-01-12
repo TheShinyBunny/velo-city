@@ -42,7 +42,8 @@ let saveTimeout: any
 
 provide('projectActions', {
     markModified: () => onProjectModified(),
-    saveProject: () => saveProject()
+    saveProject: () => saveProject(),
+    duplicateDragged: () => duplicateDraggedBlocks()
 })
 
 function onProjectModified() {
@@ -69,23 +70,28 @@ function setMousePos(event: MouseEvent) {
 
 const canvasElement = ref<HTMLElement>()
 
-async function placeBlocks(event: MouseEvent) {
+async function releaseBlocks() {
     if (dragState.value.draggedBlocks) {
         if (attach.value) {
             if (await tryAttachBlocks()) {
                 dragState.value = {}
+                attach.value = undefined
                 onProjectModified()
                 return
             }
         }
-        const canvas = canvasElement.value!
-        const group = dragState.value.draggedBlocks
-        blocks.value = [...blocks.value, group]
-        group.xPos = Math.round(event.pageX - canvas.getBoundingClientRect().left - dragState.value.offsetX)
-        group.yPos = Math.round(event.pageY - canvas.getBoundingClientRect().top - dragState.value.offsetY)
-        dragState.value = {}
-        onProjectModified()
+        placeBlocksUnattached()
     }
+}
+
+function placeBlocksUnattached() {
+    const canvas = canvasElement.value!
+    const group = dragState.value.draggedBlocks!
+    blocks.value = [...blocks.value, group]
+    group.xPos = Math.round(mousePos.value.x - canvas.getBoundingClientRect().left - dragState.value.offsetX)
+    group.yPos = Math.round(mousePos.value.y - canvas.getBoundingClientRect().top - dragState.value.offsetY)
+    dragState.value = {}
+    onProjectModified()
 }
 
 async function tryAttachBlocks() {
@@ -133,6 +139,14 @@ function pickUpGroup(event: MouseEvent, group: BlockGroup, newGroup: BlockGroup,
     onProjectModified()
 }
 
+function duplicateDraggedBlocks() {
+    if (dragState.value.draggedBlocks) {
+        const clone = useCloneDeep(dragState.value)
+        placeBlocksUnattached()
+        dragState.value = clone
+    }
+}
+
 function beforeLeave(event: Event) {
     if (saveStatus.value != SaveStatus.SAVED) {
         event.preventDefault()
@@ -146,7 +160,7 @@ function beforeLeave(event: Event) {
         <EditorNavbar v-if="project" :project="project" @refresh-project="refresh()" />
         <div class="editor-container">
             <EditorBlockPalette />
-            <div class="w-auto relative" @mouseup.left="placeBlocks" ref="canvasElement">
+            <div class="w-auto relative" @mouseup.left="releaseBlocks" ref="canvasElement">
                 <div v-for="group in blocks" :key="group" class="absolute pointer-events-none" :style="{top: group.yPos + 'px', left: group.xPos + 'px'}">
                     <EditorBlockGroupRender :group="group" @pick-up="(event, newGroup, pickedUp) => pickUpGroup(event, group, newGroup, pickedUp)" :is-template="false" />
                 </div>
