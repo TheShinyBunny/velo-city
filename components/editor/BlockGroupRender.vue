@@ -6,6 +6,7 @@ const emit = defineEmits(['pickUp'])
 const {markModified} = inject('projectActions')
 
 provide('isTemplate', isTemplate)
+provide('group', group)
 
 function startDragChild(event: MouseEvent, index: number) {
     const blocks = group.blocks.slice(index, group.blocks.length)

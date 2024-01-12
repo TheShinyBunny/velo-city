@@ -1,15 +1,12 @@
 <script setup lang="ts">
+import {useClipboard} from '@vueuse/core'
+
 const {open, results} = defineProps<{open: boolean, results: string}>()
 defineEmits(['update:open'])
-
-const copied = ref(false)
+const {copy, copied} = useClipboard()
 
 function copyCode() {
-    copied.value = true
-    navigator.clipboard.writeText(results)
-    setTimeout(() => {
-        copied.value = false
-    }, 1500)
+    copy(results)
 }
 
 </script>

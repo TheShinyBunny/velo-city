@@ -8,7 +8,7 @@ defineEmits(['changeSelection'])
     <div v-if="piece === '\n'" class="basis-full"></div>
     <p v-if="typeof piece === 'string'" draggable="false">{{ piece }}</p>
     <div v-else-if="isGroup(piece)"></div>
-    <EditorSelectInput v-else-if="isSelectionPiece(piece)" :value="piece.value" :options="piece.options" :large-text="piece.largeLabels"
+    <EditorSelectInput @contextmenu.stop v-else-if="isSelectionPiece(piece)" :value="piece.value" :options="piece.options" :large-text="piece.largeLabels"
                        @changed="$emit('changeSelection', $event)" :placeholder="piece.placeholder" />
-    <EditorExpressionSlot v-else :property="piece as Property" />
+    <EditorExpressionSlot @contextmenu.stop v-else :property="piece as Property" />
 </template>

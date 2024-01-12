@@ -8,15 +8,45 @@ import type {
     BlockType,
     SelectionPiece
 } from '~/utils/blocks'
-const emit = defineEmits(['startDragging', 'groupChanged', 'updateBlock'])
+import {useMouse, useWindowScroll} from '@vueuse/core'
+const emit = defineEmits(['startDragging', 'groupChanged', 'updateBlock', 'removeBlock'])
 
 const {block, type, pieces, isFirst, isLast} = defineProps<{block: Block, type: BlockType<any>, pieces: BlockPiece<any>[], isFirst: boolean, isLast: boolean}>()
 const isTemplate = inject('isTemplate', false)
 
 const dragState = useDragState()
-const mousePos = useMousePos()
+const contextMenu = useContextMenu()
+const mousePos = useMouse({type: 'page'})
+const {y: windowY} = useWindowScroll()
 const attach = useAttachTarget()
 const actions = ref<BlockAction<any>[]>([])
+const myContextOpen = ref(false)
+
+function onContextMenu() {
+    const top = unref(mousePos.y) - unref(windowY)
+    const left = unref(mousePos.x)
+
+    contextMenu.value.element.getBoundingClientRect = () => ({
+        width: 0,
+        height: 0,
+        top,
+        left
+    })
+
+    contextMenu.value.isOpen = true
+    myContextOpen.value = true
+}
+
+watch(contextMenu, (menu) => {
+    if (!menu.isOpen) {
+        myContextOpen.value = false
+    }
+})
+
+function updateMenuOpen(open: boolean) {
+    contextMenu.value.isOpen = open
+    myContextOpen.value = open
+}
 
 onMounted(() => {
     if (isFirst) {
@@ -31,8 +61,8 @@ function isBlockEdgeNearTop() {
     if (!dragState.value.draggedBlocks) return false
     if (!containerElement.value) return false
     const rect = containerElement.value!.getBoundingClientRect()
-    return isBetween(rect.top, mousePos.value.y - dragState.value.offsetY, rect.top + epsilon)
-        && isBetween(rect.left, mousePos.value.x - dragState.value.offsetX, rect.right)
+    return isBetween(rect.top, mousePos.y.value - dragState.value.offsetY, rect.top + epsilon)
+        && isBetween(rect.left, mousePos.x.value - dragState.value.offsetX, rect.right)
 }
 
 function isBetween(min: number, value: number, max: number) {
@@ -91,9 +121,11 @@ function selectionChanged(piece: SelectionPiece<any>, selected: string) {
         <EditorBlockGroupRender :group="pieces[0] as BlockGroup" @pick-up="pickUpGroup" :is-template="isTemplate" />
         <div v-if="isLast" class="container-end" :class="[type.color]"></div>
     </div>
-    <div v-else class="normal-piece" :class="[type.color, {'has-actions': isFirst && actions.length}]" @mousedown.left.stop="$emit('startDragging', $event)">
+    <div v-else class="normal-piece" :class="[type.color, {'has-actions': isFirst && actions.length}]" @mousedown.left.stop="$emit('startDragging', $event)"
+         @contextmenu.prevent="onContextMenu">
         <EditorPieceRender v-for="piece in pieces" :piece="piece" :key="piece" @change-selection="selectionChanged(piece as SelectionPiece<any>, $event)" />
-        <EditorActionMenu v-if="isFirst && actions.length" :actions="actions" @mousedown.stop @run-action="runAction($event)" />
+        <EditorActionMenu @contextmenu.stop v-if="isFirst && actions.length" :actions="actions" @mousedown.left.stop @run-action="runAction($event)" />
+        <EditorContextMenu :open="myContextOpen" @update:open="updateMenuOpen($event)" :block="block" @delete-block="$emit('removeBlock')" />
     </div>
 </template>
 <style scoped lang="scss">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type {Block, Property, SelectOption, SlotAttachment} from '~/utils/blocks'
 import {type NumberType} from '~/utils/types'
+import {useMouse} from '@vueuse/core'
 
 const {property} = defineProps<{property: Property}>()
 const isTemplate = inject('isTemplate', false)
@@ -24,7 +25,7 @@ onMounted(() => {
 })
 
 const dragState = useDragState()
-const mousePos = useMousePos()
+const mousePos = useMouse({type: 'page'})
 const attach = useAttachTarget()
 
 const {markModified} = inject('projectActions')
@@ -74,8 +75,8 @@ function isDraggingNearSlot() {
     if (dragState.value.draggedBlocks.blocks.length > 1) return false
     if (!isExpression(getBlockTypeNow(dragState.value.draggedBlocks.blocks![0])!)) return false
     const rect = placeholder.value!.getBoundingClientRect();
-    const isNear = isBetween(rect.top, mousePos.value.y - dragState.value.offsetY, rect.bottom)
-        && isBetween(rect.left, mousePos.value.x - dragState.value.offsetX, rect.right)
+    const isNear = isBetween(rect.top, mousePos.y.value - dragState.value.offsetY, rect.bottom)
+        && isBetween(rect.left, mousePos.x.value - dragState.value.offsetX, rect.right)
     tooltip.value = ''
     if (!isNear) return false
     if (property.canAttachBlock) {
@@ -140,7 +141,7 @@ function validateInput(event: InputEvent) {
     <EditorBlockRender v-if="property.value && !isLiteral" :block="property.value!" @start-dragging="startDragging($event)"
                        @update-block="updateBlockInSlot($event)" />
     <UPopover v-else :open="!!tooltip.length" :popper="{placement: 'top'}" :ui="{container: tooltip.length ? '' : 'hidden'}">
-        <span ref="placeholder" class="relative input-container" :class="{'cursor-text': isStringLike}" @mousedown.stop>
+        <span ref="placeholder" class="relative input-container" :class="{'cursor-text': isStringLike}" @mousedown.left.stop @contextmenu.stop>
             <EditorSelectInput v-if="property.type === 'boolean'" :value="stringVal || 'true'" :options="booleanOptions"
                                @changed="setPropertyValue($event)" />
             <EditorSelectInput v-else-if="typeKey === 'enum'" :value="stringVal" :options="property.type['options']"

@@ -11,7 +11,7 @@ const selected = ref<SelectOption | undefined>(value ? options.find(option => op
 </script>
 
 <template>
-    <div @mousedown.stop>
+    <div @mousedown.left.stop>
         <USelectMenu :model-value="selected" @change="$emit('changed', $event)" :options="options" :ui="{size: {xl: 'text-lg'}, padding: {xl: 'py-1'}}"
                      :size="largeText ? 'xl' : 'md'" :ui-menu="{option: {size: largeText ? 'text-lg' : 'text-sm'}, height: 'max-h-70'}"
                      :trailing-icon="largeText ? '' : 'i-heroicons-chevron-down-20-solid'" :placeholder="placeholder"

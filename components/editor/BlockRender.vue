@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {Block, BlockGroup, BlockPiece} from '~/utils/blocks'
+import {useMouse} from '@vueuse/core'
 const props = defineProps<{block: Block}>()
 const isTemplate = inject('isTemplate', false)
 const emit = defineEmits(['startDragging', 'attachChanged', 'updateBlock'])
@@ -59,7 +60,7 @@ function updateGroup(index: number, newGroup: BlockGroup) {
 }
 
 const dragState = useDragState()
-const mousePos = useMousePos()
+const mousePos = useMouse({type: 'page'})
 
 const blockElement = ref<HTMLElement>()
 
@@ -69,8 +70,8 @@ function isBlockEdgeAround(isBottom: boolean) {
     if (!blockElement.value) return false
     const rect = blockElement.value!.getBoundingClientRect();
     const offsetY = isBottom ? rect.bottom : rect.top
-    return isBetween(offsetY - epsilon, mousePos.value.y - dragState.value.offsetY, offsetY + epsilon)
-        && isBetween(rect.left, mousePos.value.x - dragState.value.offsetX, rect.right)
+    return isBetween(offsetY - epsilon, mousePos.y.value - dragState.value.offsetY, offsetY + epsilon)
+        && isBetween(rect.left, mousePos.x.value - dragState.value.offsetX, rect.right)
 }
 
 function isBetween(min: number, value: number, max: number) {

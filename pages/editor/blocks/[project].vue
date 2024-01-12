@@ -3,11 +3,12 @@ import type {Ref} from 'vue'
 import type {Project} from '@prisma/client'
 import type {AdjacentAttachment, BlockGroup, SlotAttachment} from '~/utils/blocks'
 import {SaveStatus} from '~/composables/useSaveState'
+import {useMouse} from '@vueuse/core'
 
 const AUTO_SAVE_TIMEOUT = 5000
 
 const dragState = useDragState()
-const mousePos = useMousePos()
+const mousePos = useMouse({type: 'page'})
 const blocks = useEditorBlocks()
 const attach = useAttachTarget()
 const saveStatus = useSaveState()
@@ -43,7 +44,8 @@ let saveTimeout: any
 provide('projectActions', {
     markModified: () => onProjectModified(),
     saveProject: () => saveProject(),
-    duplicateDragged: () => duplicateDraggedBlocks()
+    duplicateDragged: () => duplicateDraggedBlocks(),
+
 })
 
 function onProjectModified() {
@@ -62,10 +64,6 @@ async function saveProject() {
     if (saveStatus.value === SaveStatus.SAVING) {
         saveStatus.value = SaveStatus.SAVED
     }
-}
-
-function setMousePos(event: MouseEvent) {
-    mousePos.value = {x: event.pageX, y: event.pageY}
 }
 
 const canvasElement = ref<HTMLElement>()
@@ -88,8 +86,8 @@ function placeBlocksUnattached() {
     const canvas = canvasElement.value!
     const group = dragState.value.draggedBlocks!
     blocks.value = [...blocks.value, group]
-    group.xPos = Math.round(mousePos.value.x - canvas.getBoundingClientRect().left - dragState.value.offsetX)
-    group.yPos = Math.round(mousePos.value.y - canvas.getBoundingClientRect().top - dragState.value.offsetY)
+    group.xPos = Math.round(mousePos.x.value - canvas.getBoundingClientRect().left - dragState.value.offsetX)
+    group.yPos = Math.round(mousePos.y.value - canvas.getBoundingClientRect().top - dragState.value.offsetY)
     dragState.value = {}
     onProjectModified()
 }
@@ -159,7 +157,7 @@ function beforeLeave(event: Event) {
 
 </script>
 <template>
-    <div class="relative" @mousemove="setMousePos" :class="{'select-none': dragState.draggedBlocks}">
+    <div class="relative" :class="{'select-none': dragState.draggedBlocks}">
         <EditorNavbar v-if="project" :project="project" @refresh-project="refresh()" />
         <div class="editor-container">
             <EditorBlockPalette />
@@ -170,7 +168,7 @@ function beforeLeave(event: Event) {
             </div>
         </div>
         <div v-if="dragState.draggedBlocks" class="dragged-element"
-             :style="{left: (mousePos.x - dragState.offsetX) + 'px', top: (mousePos.y - dragState.offsetY) + 'px'}">
+             :style="{left: (mousePos.x.value - dragState.offsetX) + 'px', top: (mousePos.y.value - dragState.offsetY) + 'px'}">
             <EditorBlockGroupRender :group="dragState.draggedBlocks" :is-template="true" />
         </div>
     </div>
