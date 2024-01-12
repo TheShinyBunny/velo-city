@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import type {Ref} from 'vue'
-import type {Project} from '@prisma/client'
 import type {AdjacentAttachment, BlockGroup, SlotAttachment} from '~/utils/blocks'
 import {SaveStatus} from '~/composables/useSaveState'
 import {useMouse} from '@vueuse/core'
+const {$client} = useNuxtApp()
 
 const AUTO_SAVE_TIMEOUT = 5000
 
@@ -13,14 +12,12 @@ const blocks = useEditorBlocks()
 const attach = useAttachTarget()
 const saveStatus = useSaveState()
 const route = useRoute()
-const {data: project, refresh}: {data: Ref<Project>} = await useFetch(`/api/projects/get/${route.params.project}`, {
-    onResponse({response}) {
-        blocks.value = response._data.structure
-    }
-})
+const {data: project, refresh} = await $client.projects.getProject.useQuery(route.params.project as string)
+blocks.value = project.value!.structure as BlockGroup[]
 useHead({
     title: (project.value?.name || 'Loading') + ' Editor'
 })
+
 
 onBeforeRouteLeave(async () => {
     if (saveStatus.value != SaveStatus.SAVED) {
@@ -45,7 +42,6 @@ provide('projectActions', {
     markModified: () => onProjectModified(),
     saveProject: () => saveProject(),
     duplicateDragged: () => duplicateDraggedBlocks(),
-
 })
 
 function onProjectModified() {
@@ -60,7 +56,7 @@ function onProjectModified() {
 
 async function saveProject() {
     saveStatus.value = SaveStatus.SAVING
-    await $fetch('/api/projects/update', {body: {projectId: project.value.id, structure: blocks.value}, method: 'POST'})
+    await $client.projects.update.mutate({projectId: project.value!.id, structure: blocks.value})
     if (saveStatus.value === SaveStatus.SAVING) {
         saveStatus.value = SaveStatus.SAVED
     }
@@ -86,8 +82,8 @@ function placeBlocksUnattached() {
     const canvas = canvasElement.value!
     const group = dragState.value.draggedBlocks!
     blocks.value = [...blocks.value, group]
-    group.xPos = Math.round(mousePos.x.value - canvas.getBoundingClientRect().left - dragState.value.offsetX)
-    group.yPos = Math.round(mousePos.y.value - canvas.getBoundingClientRect().top - dragState.value.offsetY)
+    group.xPos = Math.round(mousePos.x.value - canvas.getBoundingClientRect().left - dragState.value.offsetX!)
+    group.yPos = Math.round(mousePos.y.value - canvas.getBoundingClientRect().top - dragState.value.offsetY!)
     dragState.value = {}
     onProjectModified()
 }

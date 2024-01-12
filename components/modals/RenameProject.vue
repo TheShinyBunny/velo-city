@@ -1,13 +1,14 @@
 <script setup lang="ts">
 const {open, name, projectId} = defineProps<{open: boolean, name: string, projectId: string}>()
 const emit = defineEmits(['update:open', 'closed'])
+const {$client} = useNuxtApp()
 
 let newName = ref(name)
 let loading = ref(false)
 
 async function rename() {
     loading.value = true
-    await $fetch('/api/projects/rename', {method: 'POST', body: {projectId: projectId, name: newName.value}})
+    await $client.projects.rename.mutate({projectId: projectId, name: newName.value})
     loading.value = false
     emit('update:open', false)
     emit('closed', newName)

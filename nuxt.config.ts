@@ -17,5 +17,13 @@ export default defineNuxtConfig({
   },
   colorMode: {
     preference: 'light'
+  },
+  build: {
+    transpile: [
+        'trpc-nuxt'
+    ]
+  },
+  typescript: {
+    shim: true
   }
 })

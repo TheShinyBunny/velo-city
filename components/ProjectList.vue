@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type {Project} from '@prisma/client'
-import type {Ref} from 'vue'
 
-const {data} = useAuthState()
-const {data: projects}: {data: Ref<Project[]>} = await useLazyFetch(`/api/projects/user/${data.value?.user.id}`, {key: 'projects'})
+const {$client} = useNuxtApp()
+
+const {data: projects}: {data: Ref<Project[] | null>} = await $client.projects.userProjects.useLazyQuery()
 
 async function createProject() {
-    const res = await $fetch('/api/projects/create', {body: {name: 'Untitled Project'}, method: 'POST'})
+    const res = await $client.projects.create.mutate({name: 'Untitled Project'})
     await navigateTo(`/editor/blocks/${res.id}`)
 }
 

@@ -6,7 +6,7 @@ const {open, block} = defineProps<{open: boolean, block: Block}>()
 const emit = defineEmits(['update:open', 'deleteBlock'])
 const dragState = useDragState()
 const contextMenu = useContextMenu()
-const group: BlockGroup | undefined = inject('group')
+const group: BlockGroup | undefined = inject('group', undefined)
 
 const items: DropdownItem[] = [
     {
@@ -38,7 +38,7 @@ const items: DropdownItem[] = [
 ]
 
 function runAction(item: DropdownItem) {
-    item.click?.call(this);
+    item.click?.call(undefined);
     emit('update:open', false)
 }
 

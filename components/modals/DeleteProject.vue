@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type {Project} from '@prisma/client'
+const {$client} = useNuxtApp()
 
 const {open, project} = defineProps<{open: boolean, project: Project}>()
 defineEmits(['update:open'])
@@ -9,7 +10,7 @@ let loading = ref(false)
 
 async function confirmDelete() {
     loading.value = true
-    await useFetch('/api/projects/delete', {body: {projectId: project.id}})
+    await $client.projects.delete.mutate(project.id)
     loading.value = false
     router.replace('/dashboard')
 }
