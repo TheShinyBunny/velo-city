@@ -4,6 +4,7 @@ import {
     ComputationBlock,
     ExpressionBlock,
     type Property,
+    type SelectionPiece,
     StatementBlock,
     type TypedSelectOption
 } from '~/utils/blocks'
@@ -213,7 +214,7 @@ export class MultiCallableBlock extends ComputationBlock<MultiCallableData> {
     }
 
     render(data: MultiCallableData): BlockPiece<MultiCallableData>[] {
-        return [{
+        const selectPiece: SelectionPiece<MultiCallableData> = {
             value: data.selected.value,
             options: data.functions, onChange: (value, block) => {
                 const func = data.functions.find(func => func.value === value)!
@@ -221,7 +222,11 @@ export class MultiCallableBlock extends ComputationBlock<MultiCallableData> {
                     selected: func
                 })
             }
-        }, data.target, ...(data.selected.params || [])]
+        }
+        if (data.selected.params?.length) {
+            return [data.target, selectPiece, ...data.selected.params]
+        }
+        return [selectPiece, data.target]
     }
 }
 

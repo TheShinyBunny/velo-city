@@ -61,9 +61,10 @@ function startDragging(event: MouseEvent) {
         offsetX: event.clientX - rect.left,
         offsetY: event.clientY - rect.top
     }
+    const block = property.value!
     delete property.value
     if (property.onAttachedBlockChange) {
-        currentBlock.set(property.onAttachedBlockChange(property, currentBlock.get()))
+        currentBlock.set(property.onAttachedBlockChange(property, currentBlock.get(), block))
     }
 }
 
@@ -138,7 +139,7 @@ function validateInput(event: InputEvent) {
 <template>
     <EditorBlockRender v-if="property.value && !isLiteral" :block="property.value!" @start-dragging="startDragging($event)"
                        @update-block="updateBlockInSlot($event)" />
-    <UPopover v-else :open="!!tooltip.length" :popper="{placement: 'top'}">
+    <UPopover v-else :open="!!tooltip.length" :popper="{placement: 'top'}" :ui="{container: tooltip.length ? '' : 'hidden'}">
         <span ref="placeholder" class="relative input-container" :class="{'cursor-text': isStringLike}" @mousedown.stop>
             <EditorSelectInput v-if="property.type === 'boolean'" :value="stringVal || 'true'" :options="booleanOptions"
                                @changed="setPropertyValue($event)" />

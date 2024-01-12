@@ -45,7 +45,7 @@ export interface Property {
     optional?: boolean
     error?: string
     canAttachBlock?: (property: Property, block: Block) => string | undefined
-    onAttachedBlockChange?: (property: Property, parent: Block) => Block
+    onAttachedBlockChange?: (property: Property, parent: Block, block: Block) => Block
 }
 
 export interface SelectionPiece<T> {

@@ -116,7 +116,7 @@ async function tryAttachBlocks() {
         if (dragState.value.draggedBlocks?.blocks.length === 1 && await isBlockExpression(dragState.value.draggedBlocks?.blocks[0]!)) {
             slot.property.value = dragState.value.draggedBlocks?.blocks[0]!
             if (slot.property.onAttachedBlockChange) {
-                slot.updateParent(slot.property.onAttachedBlockChange(slot.property, slot.parent))
+                slot.updateParent(slot.property.onAttachedBlockChange(slot.property, slot.parent, slot.property.value!))
             }
             return true
         }

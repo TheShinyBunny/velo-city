@@ -2,7 +2,7 @@ import {type Block} from '~/utils/blocks'
 import type {FunctionOption} from '~/utils/fields'
 
 
-const stringFunctions: FunctionOption[] = [
+export const stringFunctions: FunctionOption[] = [
     {
         value: 'toLowerCase',
         label: 'Convert to lower case',

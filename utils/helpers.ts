@@ -22,11 +22,6 @@ export function createElementProp(): Property {
     return {label: 'Element', type: 'element'}
 }
 
-export function createSingleGroup(block: Block): BlockGroup {
-    const copy = structuredClone(block)
-    return {blocks: [copy]}
-}
-
 export function createReadWriteElementField(key: string, label: string, type: ExpressionType, oppositeLabel?: string): Block[] {
     return [
         {type: 'fieldAccess', data: {target: createElementProp(), key, label, type, oppositeLabel}},
@@ -117,4 +112,14 @@ export function isProperty(value: any): value is Property {
 
 export function isPropertyWithValue(value: any): value is Property {
     return value.label && value.type && value.value
+}
+
+export function isPartialMatch(obj: any, partial: any): boolean {
+    return Object.keys(partial).every(k =>
+        partial[k] && obj[k]
+            ? partial[k] instanceof Object
+                ? isPartialMatch(obj[k], partial[k])
+                : partial[k] === obj[k]
+            : false
+    )
 }

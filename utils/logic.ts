@@ -48,7 +48,7 @@ const operands: Operand[] = [
     }
 ]
 
-interface ComparisonData {
+export interface ComparisonData {
   left: Property
   right: Property
   operand: Operand
