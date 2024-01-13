@@ -1,4 +1,4 @@
-import type {SelectOption} from '~/utils/blocks'
+import type { SelectOption } from '~/utils/blocks'
 
 export type SimpleTypes = 'any'
     | 'boolean'
@@ -77,30 +77,30 @@ export interface PromiseType extends ComplexType {
 export const stringTypes: TypeKey[] = ['any', 'color', 'element', 'image', 'string', 'enum', 'number', 'link']
 
 export function canAssignTypes(value: ExpressionType, to: ExpressionType): boolean {
-    if (Array.isArray(value)) {
-        return value.some(option => canAssignTypes(option, to))
-    }
-    if (Array.isArray(to)) {
-        return to.some(option => canAssignTypes(value, option))
-    }
-    const valueType = getTypeKey(value as SingleType)
-    const toType = getTypeKey(to as SingleType)
-    return areSimilar(valueType, toType)
+  if (Array.isArray(value)) {
+    return value.some(option => canAssignTypes(option, to))
+  }
+  if (Array.isArray(to)) {
+    return to.some(option => canAssignTypes(value, option))
+  }
+  const valueType = getTypeKey(value as SingleType)
+  const toType = getTypeKey(to as SingleType)
+  return areSimilar(valueType, toType)
 }
 
 function areSimilar(first: TypeKey, second: TypeKey): boolean {
-    if (first === second) return true
-    return stringTypes.includes(first) && stringTypes.includes(second)
+  if (first === second) { return true }
+  return stringTypes.includes(first) && stringTypes.includes(second)
 }
 
 export function getTypeKey(type: SingleType): TypeKey {
-    if (typeof type === 'string') return type
-    return type.type
+  if (typeof type === 'string') { return type }
+  return type.type
 }
 
 export function asSingleType(type: ExpressionType): SingleType {
-    if (Array.isArray(type)) return asSingleType(type[0])
-    return type as SingleType
+  if (Array.isArray(type)) { return asSingleType(type[0]) }
+  return type as SingleType
 }
 
 type ComplexKeyToType = {
@@ -118,30 +118,30 @@ type TypeNameMap = {
 }
 
 const typeNames: TypeNameMap = {
-    any: 'Any Value',
-    boolean: 'Boolean',
-    color: 'Color',
-    element: 'Wix Element',
-    link: 'Link',
-    image: 'Image',
-    void: 'Nothing',
-    string: (str: string | StringType) => 'Text',
-    number: (num: string | NumberType) => typeof num !== 'string' && num.integer ? 'Whole Number' : 'Number',
-    date: (date: string | DateType) => 'Date',
-    enum: (en: EnumType) => en.name,
-    array: (arr: ArrayType) => 'Array of ' + getTypeName(arr.elements),
-    object: (obj: ObjectType) => obj.name,
-    promise: (promise: PromiseType) => 'Async Operation resulting in ' + getTypeName(promise.of)
+  any: 'Any Value',
+  boolean: 'Boolean',
+  color: 'Color',
+  element: 'Wix Element',
+  link: 'Link',
+  image: 'Image',
+  void: 'Nothing',
+  string: (str: string | StringType) => 'Text',
+  number: (num: string | NumberType) => typeof num !== 'string' && num.integer ? 'Whole Number' : 'Number',
+  date: (date: string | DateType) => 'Date',
+  enum: (en: EnumType) => en.name,
+  array: (arr: ArrayType) => 'Array of ' + getTypeName(arr.elements),
+  object: (obj: ObjectType) => obj.name,
+  promise: (promise: PromiseType) => 'Async Operation resulting in ' + getTypeName(promise.of)
 }
 
 export function getTypeName(type: ExpressionType): string {
-    if (Array.isArray(type)) {
-        return type.map(subType => getTypeName(subType)).join(' or ')
-    }
-    const key = getTypeKey(type as SingleType)
-    const name = typeNames[key]
-    if (typeof name === 'function') {
-        return name(type as any)
-    }
-    return name
+  if (Array.isArray(type)) {
+    return type.map(subType => getTypeName(subType)).join(' or ')
+  }
+  const key = getTypeKey(type as SingleType)
+  const name = typeNames[key]
+  if (typeof name === 'function') {
+    return name(type as any)
+  }
+  return name
 }

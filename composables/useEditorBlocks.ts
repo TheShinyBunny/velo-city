@@ -1,5 +1,5 @@
-import type {BlockGroup} from '~/utils/blocks'
+import type { BlockGroup } from '~/utils/blocks'
 
-export default function () {
-    return useState<BlockGroup[]>(() => [])
+export default function() {
+  return useState<BlockGroup[]>(() => [])
 }

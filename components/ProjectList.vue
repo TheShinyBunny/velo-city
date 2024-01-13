@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import type {Project} from '@prisma/client'
+import type { Project } from '@prisma/client'
 
-const {$client} = useNuxtApp()
+const { $client } = useNuxtApp()
 
-const {data: projects}: {data: Ref<Project[] | null>} = await $client.projects.userProjects.useLazyQuery()
+const { data: projects }: {data: Ref<Project[] | null>} = await $client.projects.userProjects.useLazyQuery()
 
 async function createProject() {
-    const res = await $client.projects.create.mutate({name: 'Untitled Project'})
-    await navigateTo(`/editor/blocks/${res.id}`)
+  const res = await $client.projects.create.mutate({ name: 'Untitled Project' })
+  await navigateTo(`/editor/blocks/${res.id}`)
 }
 
 </script>
 <template>
-    <div class="project-list">
-        <div class="card new-project" @click="createProject()">
-            <UIcon name="i-mdi-add" />
-            <p>Create New Project</p>
-        </div>
-        <NuxtLink v-for="project in projects" class="card" :to="`/editor/blocks/${project.id}`">
-            <p>{{ project.name }}</p>
-        </NuxtLink>
+  <div class="project-list">
+    <div class="card new-project" @click="createProject()">
+      <UIcon name="i-mdi-add" />
+      <p>Create New Project</p>
     </div>
+    <NuxtLink v-for="project in projects" class="card" :to="`/editor/blocks/${project.id}`">
+      <p>{{ project.name }}</p>
+    </NuxtLink>
+  </div>
 </template>
 <style scoped lang="scss">
 .project-list {

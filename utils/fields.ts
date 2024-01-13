@@ -1,15 +1,15 @@
 import {
-    type BlockAction,
-    type BlockPiece,
-    ComputationBlock,
-    ExpressionBlock,
-    type Property,
-    type SelectionPiece,
-    StatementBlock,
-    type TypedSelectOption
+  type BlockAction,
+  type BlockPiece,
+  ComputationBlock,
+  ExpressionBlock,
+  type Property,
+  type SelectionPiece,
+  StatementBlock,
+  type TypedSelectOption
 } from '~/utils/blocks'
-import {Compiler} from '~/utils/compiler'
-import type {ExpressionType} from '~/utils/types'
+import { Compiler } from '~/utils/compiler'
+import type { ExpressionType } from '~/utils/types'
 
 export interface FieldAccessData {
     target: Property
@@ -21,36 +21,36 @@ export interface FieldAccessData {
 }
 
 export class FieldAccessBlock extends ExpressionBlock<FieldAccessData> {
-    color: string = 'bg-indigo-400'
+  color: string = 'bg-indigo-400'
 
-    getResultType(data: FieldAccessData): ExpressionType {
-        return data.type
+  getResultType(data: FieldAccessData): ExpressionType {
+    return data.type
+  }
+
+  compile(ctx: Compiler, data: FieldAccessData): void {
+    if (data.negated) {
+      ctx.write('!')
     }
+    ctx.writeProperty(data.target)
+    ctx.write('.' + data.key)
+  }
 
-    compile(ctx: Compiler, data: FieldAccessData): void {
-        if (data.negated) {
-            ctx.write('!')
+  render(data: FieldAccessData): BlockPiece<FieldAccessData>[] {
+    return data.type === 'boolean' ? ['Is', data.target, data.negated ? data.oppositeLabel! : data.label] : [data.label, 'of', data.target]
+  }
+
+  getActions(data: FieldAccessData): BlockAction<FieldAccessData>[] {
+    return [
+      ...addIf<BlockAction<FieldAccessData>>(data.type === 'boolean' && !!data.oppositeLabel, {
+        label: 'Change to ' + (data.negated ? data.label : data.oppositeLabel),
+        run: (ctx, block) => {
+          return withData(block, {
+            negated: !block.data!.negated
+          })
         }
-        ctx.writeProperty(data.target)
-        ctx.write('.' + data.key)
-    }
-
-    render(data: FieldAccessData): BlockPiece<FieldAccessData>[] {
-        return data.type === 'boolean' ? ['Is', data.target, data.negated ? data.oppositeLabel! : data.label] : [data.label, 'of', data.target]
-    }
-
-    getActions(data: FieldAccessData): BlockAction<FieldAccessData>[] {
-        return [
-            ...addIf<BlockAction<FieldAccessData>>(data.type === 'boolean' && !!data.oppositeLabel, {
-                label: 'Change to ' + (data.negated ? data.label : data.oppositeLabel),
-                run: (ctx, block) => {
-                    return withData(block, {
-                        negated: !block.data!.negated
-                    })
-                }
-            })
-        ]
-    }
+      })
+    ]
+  }
 }
 
 export interface MultiFieldAccessData {
@@ -60,26 +60,28 @@ export interface MultiFieldAccessData {
 }
 
 export class MultiFieldAccessBlock extends ExpressionBlock<MultiFieldAccessData> {
-    color: string = 'bg-indigo-400'
+  color: string = 'bg-indigo-400'
 
-    getResultType(data: MultiFieldAccessData): ExpressionType {
-        return data.selected.type
-    }
+  getResultType(data: MultiFieldAccessData): ExpressionType {
+    return data.selected.type
+  }
 
-    compile(ctx: Compiler, data: MultiFieldAccessData): void {
-        ctx.writeProperty(data.target)
-        ctx.write('.' + data.selected.value)
-    }
+  compile(ctx: Compiler, data: MultiFieldAccessData): void {
+    ctx.writeProperty(data.target)
+    ctx.write('.' + data.selected.value)
+  }
 
-    render(data: MultiFieldAccessData): BlockPiece<MultiFieldAccessData>[] {
-        return [{
-            value: data.selected.value, options: data.fields, onChange: (value, block) => {
-                return withData(block, {
-                    selected: data.fields.find(field => field.value === value)
-                })
-            }
-        }, 'of', data.target]
-    }
+  render(data: MultiFieldAccessData): BlockPiece<MultiFieldAccessData>[] {
+    return [{
+      value: data.selected.value,
+      options: data.fields,
+      onChange: (value, block) => {
+        return withData(block, {
+          selected: data.fields.find(field => field.value === value)
+        })
+      }
+    }, 'of', data.target]
+  }
 }
 
 export interface CallableData {
@@ -95,87 +97,87 @@ export interface CallableData {
 }
 
 export class CallableBlock extends ComputationBlock<CallableData> {
-    color: string = 'bg-purple-400'
+  color: string = 'bg-purple-400'
 
-    getResultType(data: CallableData): ExpressionType {
-        return data.returnType
-    }
+  getResultType(data: CallableData): ExpressionType {
+    return data.returnType
+  }
 
-    compile(ctx: Compiler, data: CallableData): void {
-        if (data.toggleable && data.toggling) {
-            ctx.write('if (')
-            ctx.writeProperty(data.target)
-            ctx.writeLine('.' + data.toggleable.toLowerCase() + ') {')
-            ctx.indent(() => {
-                ctx.writeProperty(data.target)
-                ctx.write('.' + data.key + '()')
-            })
-            ctx.writeLine()
-            ctx.writeLine('} else {')
-            ctx.indent(() => {
-                ctx.writeProperty(data.target)
-                ctx.write('.' + data.key + '()')
-            })
-            ctx.writeLine()
-            ctx.write('}')
-        } else {
-            ctx.writeProperty(data.target)
-            ctx.write('.' + data.key + '(')
-            if (data.params) {
-                let first = true
-                for (let param of data.params) {
-                    if (!param.optional || param.value) {
-                        if (!first) {
-                            ctx.write(', ')
-                        }
-                        ctx.writeProperty(param)
-                        first = false
-                    }
-                }
+  compile(ctx: Compiler, data: CallableData): void {
+    if (data.toggleable && data.toggling) {
+      ctx.write('if (')
+      ctx.writeProperty(data.target)
+      ctx.writeLine('.' + data.toggleable.toLowerCase() + ') {')
+      ctx.indent(() => {
+        ctx.writeProperty(data.target)
+        ctx.write('.' + data.key + '()')
+      })
+      ctx.writeLine()
+      ctx.writeLine('} else {')
+      ctx.indent(() => {
+        ctx.writeProperty(data.target)
+        ctx.write('.' + data.key + '()')
+      })
+      ctx.writeLine()
+      ctx.write('}')
+    } else {
+      ctx.writeProperty(data.target)
+      ctx.write('.' + data.key + '(')
+      if (data.params) {
+        let first = true
+        for (const param of data.params) {
+          if (!param.optional || param.value) {
+            if (!first) {
+              ctx.write(', ')
             }
-            ctx.write(')')
+            ctx.writeProperty(param)
+            first = false
+          }
         }
+      }
+      ctx.write(')')
     }
+  }
 
-    render(data: CallableData): BlockPiece<CallableData>[] {
-        if (data.toggleable && data.toggling) {
-            return ['Toggle', data.toggleable, 'state of', data.target]
+  render(data: CallableData): BlockPiece<CallableData>[] {
+    if (data.toggleable && data.toggling) {
+      return ['Toggle', data.toggleable, 'state of', data.target]
+    }
+    return [data.label, data.target, ...(data.params || [])]
+  }
+
+  getActions(data: CallableData): BlockAction<CallableData>[] {
+    return [
+      ...addIf<BlockAction<CallableData>>(!!data.oppositeLabel, {
+        label: 'Change to ' + data.oppositeLabel,
+        run: (ctx, block) => {
+          return withData(block, {
+            key: data.oppositeKey,
+            label: data.oppositeLabel,
+            oppositeKey: block.data!.key,
+            oppositeLabel: block.data!.label,
+            toggling: false
+          })
         }
-        return [data.label, data.target, ...(data.params || [])]
-    }
-
-    getActions(data: CallableData): BlockAction<CallableData>[] {
-        return [
-            ...addIf<BlockAction<CallableData>>(!!data.oppositeLabel, {
-                label: 'Change to ' + data.oppositeLabel,
-                run: (ctx, block) => {
-                    return withData(block, {
-                        key: data.oppositeKey,
-                        label: data.oppositeLabel,
-                        oppositeKey: block.data!.key,
-                        oppositeLabel: block.data!.label,
-                        toggling: false
-                    })
-                }
-            }),
-            ...addIf<BlockAction<CallableData>>(!!data.toggleable && !!data.toggling, {
-                label: 'Change to ' + data.label,
-                run: (ctx, block) => {
-                    return withData(block, {
-                        toggling: false
-                    })
-                }
-            }),
-            ...addIf<BlockAction<CallableData>>(!!data.toggleable && !data.toggling, {
-                label: 'Toggle ' + data.toggleable + ' state',
-                run: (ctx, block) => {
-                    return withData(block, {
-                        toggling: true
-                    })
-                }
-            }),
-        ]
-    }
+      }),
+      ...addIf<BlockAction<CallableData>>(!!data.toggleable && !!data.toggling, {
+        label: 'Change to ' + data.label,
+        run: (ctx, block) => {
+          return withData(block, {
+            toggling: false
+          })
+        }
+      }),
+      ...addIf<BlockAction<CallableData>>(!!data.toggleable && !data.toggling, {
+        label: 'Toggle ' + data.toggleable + ' state',
+        run: (ctx, block) => {
+          return withData(block, {
+            toggling: true
+          })
+        }
+      })
+    ]
+  }
 }
 
 export interface FunctionOption extends TypedSelectOption {
@@ -189,45 +191,46 @@ export interface MultiCallableData {
 }
 
 export class MultiCallableBlock extends ComputationBlock<MultiCallableData> {
-    color: string = 'bg-purple-400'
+  color: string = 'bg-purple-400'
 
-    getResultType(data: MultiCallableData): ExpressionType {
-        return data.selected.type
-    }
+  getResultType(data: MultiCallableData): ExpressionType {
+    return data.selected.type
+  }
 
-    compile(ctx: Compiler, data: MultiCallableData): void {
-        ctx.writeProperty(data.target)
-        ctx.write('.' + data.selected.value + '(')
-        if (data.selected.params) {
-            let first = true
-            for (let param of data.selected.params) {
-                if (!param.optional || param.value) {
-                    if (!first) {
-                        ctx.write(', ')
-                    }
-                    ctx.writeProperty(param)
-                    first = false
-                }
-            }
+  compile(ctx: Compiler, data: MultiCallableData): void {
+    ctx.writeProperty(data.target)
+    ctx.write('.' + data.selected.value + '(')
+    if (data.selected.params) {
+      let first = true
+      for (const param of data.selected.params) {
+        if (!param.optional || param.value) {
+          if (!first) {
+            ctx.write(', ')
+          }
+          ctx.writeProperty(param)
+          first = false
         }
-        ctx.write(')')
+      }
     }
+    ctx.write(')')
+  }
 
-    render(data: MultiCallableData): BlockPiece<MultiCallableData>[] {
-        const selectPiece: SelectionPiece<MultiCallableData> = {
-            value: data.selected.value,
-            options: data.functions, onChange: (value, block) => {
-                const func = data.functions.find(func => func.value === value)!
-                return withData(block, {
-                    selected: func
-                })
-            }
-        }
-        if (data.selected.params?.length) {
-            return [data.target, selectPiece, ...data.selected.params]
-        }
-        return [selectPiece, data.target]
+  render(data: MultiCallableData): BlockPiece<MultiCallableData>[] {
+    const selectPiece: SelectionPiece<MultiCallableData> = {
+      value: data.selected.value,
+      options: data.functions,
+      onChange: (value, block) => {
+        const func = data.functions.find(func => func.value === value)!
+        return withData(block, {
+          selected: func
+        })
+      }
     }
+    if (data.selected.params?.length) {
+      return [data.target, selectPiece, ...data.selected.params]
+    }
+    return [selectPiece, data.target]
+  }
 }
 
 export interface FieldSetterData {
@@ -240,47 +243,47 @@ export interface FieldSetterData {
 }
 
 export class FieldSetterBlock extends StatementBlock<FieldSetterData> {
-    color: string = 'bg-indigo-500'
+  color: string = 'bg-indigo-500'
 
-    compile(ctx: Compiler, data: FieldSetterData): void {
-        ctx.writeProperty(data.target)
-        ctx.write('.' + data.key + ' = ')
-        if (data.toggleable && data.toggling) {
-            ctx.write('!')
-            ctx.writeProperty(data.target)
-            ctx.write('.' + data.key)
-        } else {
-            ctx.writeProperty(data.value)
+  compile(ctx: Compiler, data: FieldSetterData): void {
+    ctx.writeProperty(data.target)
+    ctx.write('.' + data.key + ' = ')
+    if (data.toggleable && data.toggling) {
+      ctx.write('!')
+      ctx.writeProperty(data.target)
+      ctx.write('.' + data.key)
+    } else {
+      ctx.writeProperty(data.value)
+    }
+  }
+
+  render(data: FieldSetterData): BlockPiece<FieldSetterData>[] {
+    if (data.toggleable && data.toggling) {
+      return ['Toggle', data.label, 'state of', data.target]
+    }
+    return ['Set', data.label, 'of', data.target, 'to', data.value]
+  }
+
+  getActions(data: FieldSetterData): BlockAction<FieldSetterData>[] {
+    return [
+      ...addIf<BlockAction<FieldSetterData>>(!!data.toggleable && !data.toggling, {
+        label: 'Toggle ' + data.toggleable + ' state',
+        run: (ctx, block) => {
+          return withData(block, {
+            toggling: true
+          })
         }
-    }
-
-    render(data: FieldSetterData): BlockPiece<FieldSetterData>[] {
-        if (data.toggleable && data.toggling) {
-            return ['Toggle', data.label, 'state of', data.target]
+      }),
+      ...addIf<BlockAction<FieldSetterData>>(!!data.toggleable && !!data.toggling, {
+        label: 'Set manual value',
+        run: (ctx, block) => {
+          return withData(block, {
+            toggling: false
+          })
         }
-        return ['Set', data.label, 'of', data.target, 'to', data.value]
-    }
-
-    getActions(data: FieldSetterData): BlockAction<FieldSetterData>[] {
-        return [
-            ...addIf<BlockAction<FieldSetterData>>(!!data.toggleable && !data.toggling, {
-                label: 'Toggle ' + data.toggleable + ' state',
-                run: (ctx, block) => {
-                    return withData(block, {
-                        toggling: true
-                    })
-                }
-            }),
-            ...addIf<BlockAction<FieldSetterData>>(!!data.toggleable && !!data.toggling, {
-                label: 'Set manual value',
-                run: (ctx, block) => {
-                    return withData(block, {
-                        toggling: false
-                    })
-                }
-            })
-        ]
-    }
+      })
+    ]
+  }
 }
 
 export interface MultiFieldSetterData {
@@ -291,24 +294,25 @@ export interface MultiFieldSetterData {
 }
 
 export class MultiFieldSetterBlock extends StatementBlock<MultiFieldSetterData> {
-    color: string = 'bg-indigo-500'
+  color: string = 'bg-indigo-500'
 
-    compile(ctx: Compiler, data: MultiFieldSetterData): void {
-        ctx.writeProperty(data.target)
-        ctx.write('.' + data.selected.value + ' = ')
-        ctx.writeProperty(data.value)
-    }
+  compile(ctx: Compiler, data: MultiFieldSetterData): void {
+    ctx.writeProperty(data.target)
+    ctx.write('.' + data.selected.value + ' = ')
+    ctx.writeProperty(data.value)
+  }
 
-    render(data: MultiFieldSetterData): BlockPiece<MultiFieldSetterData>[] {
-        return ['Set', {
-            value: data.selected.value,
-            options: data.fields, onChange: (value, block) => {
-                const field = data.fields.find(field => field.value === value)!
-                return withData(block, {
-                    selected: field,
-                    value: {label: field.label, type: field.type, value: data.value.value}
-                })
-            }
-        }, 'of', data.target, 'to', data.value]
-    }
+  render(data: MultiFieldSetterData): BlockPiece<MultiFieldSetterData>[] {
+    return ['Set', {
+      value: data.selected.value,
+      options: data.fields,
+      onChange: (value, block) => {
+        const field = data.fields.find(field => field.value === value)!
+        return withData(block, {
+          selected: field,
+          value: { label: field.label, type: field.type, value: data.value.value }
+        })
+      }
+    }, 'of', data.target, 'to', data.value]
+  }
 }

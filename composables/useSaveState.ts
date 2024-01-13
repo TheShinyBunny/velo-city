@@ -4,6 +4,6 @@ export enum SaveStatus {
     SAVING = 'Saving'
 }
 
-export default function () {
-    return useState<SaveStatus>(() => SaveStatus.SAVED)
+export default function() {
+  return useState<SaveStatus>(() => SaveStatus.SAVED)
 }

@@ -1,5 +1,5 @@
-import {Compiler} from './compiler'
-import type {ExpressionType} from '~/utils/types'
+import { Compiler } from './compiler'
+import type { ExpressionType } from '~/utils/types'
 
 export interface Block<T = any> {
     type: BlockTypes
@@ -78,53 +78,54 @@ export interface BlockEditor {
 let registry: any
 
 export async function createRegistry() {
-    const control = await import('./control')
-    const events = await import('./events')
-    const logic = await import('./logic')
-    const values = await import('./values')
-    const fields = await import('./fields')
-    const crm = await import('./velo/crm')
-    const data = await import('./velo/data')
-    return registry = {
-        ifBlock: new control.IfBlock(),
-        onReady: new events.OnReady(),
-        comparison: new logic.Comparison(),
-        unary: new logic.UnaryOperation(),
-        logicGate: new logic.BinaryLogicGate(),
-        literal: new values.LiteralValue(),
-        elementEvent: new events.ElementEvent(),
-        callable: new fields.CallableBlock(),
-        multiCallable: new fields.MultiCallableBlock(),
-        fieldAccess: new fields.FieldAccessBlock(),
-        multiFieldAccess: new fields.MultiFieldAccessBlock(),
-        fieldSetter: new fields.FieldSetterBlock(),
-        multiFieldSetter: new fields.MultiFieldSetterBlock(),
-        sendTriggeredEmail: new crm.SendTriggeredEmail(),
-        createContact: new crm.CreateContact(),
-        createFilter: new data.CreateFilter(),
-        setFilter: new data.SetFilter(),
-        error: new values.ErrorBlock()
-    }
+  const control = await import('./control')
+  const events = await import('./events')
+  const logic = await import('./logic')
+  const values = await import('./values')
+  const fields = await import('./fields')
+  const crm = await import('./velo/crm')
+  const data = await import('./velo/data')
+
+  return registry = {
+    ifBlock: new control.IfBlock(),
+    onReady: new events.OnReady(),
+    comparison: new logic.Comparison(),
+    unary: new logic.UnaryOperation(),
+    logicGate: new logic.BinaryLogicGate(),
+    literal: new values.LiteralValue(),
+    elementEvent: new events.ElementEvent(),
+    callable: new fields.CallableBlock(),
+    multiCallable: new fields.MultiCallableBlock(),
+    fieldAccess: new fields.FieldAccessBlock(),
+    multiFieldAccess: new fields.MultiFieldAccessBlock(),
+    fieldSetter: new fields.FieldSetterBlock(),
+    multiFieldSetter: new fields.MultiFieldSetterBlock(),
+    sendTriggeredEmail: new crm.SendTriggeredEmail(),
+    createContact: new crm.CreateContact(),
+    createFilter: new data.CreateFilter(),
+    setFilter: new data.SetFilter(),
+    error: new values.ErrorBlock()
+  }
 }
 
-export async function getBlockType<T>(block: Block<T>): Promise<BlockType<T>> {
-    return getType(block.type)
+export function getBlockType<T> (block: Block<T>): Promise<BlockType<T>> {
+  return getType(block.type)
 }
 
 export async function getType(type: BlockTypes): Promise<BlockType<any>> {
-    let reg = registry
-    if (!reg) reg = await createRegistry()
-    return reg[type]
+  let reg = registry
+  if (!reg) { reg = await createRegistry() }
+  return reg[type]
 }
 
-export function getBlockTypeNow<T>(block: Block<T>): BlockType<T> | undefined {
-    return getTypeNow(block.type)
+export function getBlockTypeNow<T> (block: Block<T>): BlockType<T> | undefined {
+  return getTypeNow(block.type)
 }
 
 export function getTypeNow(type: BlockTypes): BlockType<any> | undefined {
-    let reg = registry
-    if (!reg) return undefined
-    return reg[type]
+  const reg = registry
+  if (!reg) { return undefined }
+  return reg[type]
 }
 
 export type BlockTypes = keyof Awaited<ReturnType<typeof createRegistry>>
