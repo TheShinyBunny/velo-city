@@ -3,8 +3,8 @@ import {z} from 'zod'
 import bcrypt from 'bcrypt'
 import * as crypto from 'crypto'
 import nodemailer from 'nodemailer'
-import {hashToken as nextHash} from 'next-auth/core/lib/utils'
 import {TRPCError} from '@trpc/server'
+import {createHash} from 'crypto'
 
 const ONE_DAY_IN_SECONDS = 86400
 
@@ -45,7 +45,7 @@ export const usersRouter = router({
         })
 
         const token = crypto.randomBytes(32).toString('hex')
-        const hashedTokenNext = nextHash(token, {provider: {secret: process.env.APP_SECRET}})
+        const hashedTokenNext = hashToken(token)
 
         await ctx.prisma.verificationToken.upsert({
             where: {
@@ -68,6 +68,12 @@ export const usersRouter = router({
         })}`)
     })
 })
+
+function hashToken(token: string) {
+    return createHash("sha256")
+            .update(`${token}${process.env.APP_SECRET}`)
+            .digest("hex")
+}
 
 async function sendVerificationEmail(email: string, link: string) {
     const transport = nodemailer.createTransport({
