@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type {DropdownItem} from '#ui/types'
 
-const {status, data, signOut, signIn} = useAuth()
+const {status, data, signOut} = useAuth()
 
-let loginModalOpen = ref(false)
+const loginModalOpen = ref(false)
 
 const userMenuItems: DropdownItem[][] = [
     [
@@ -38,25 +38,8 @@ const userMenuItems: DropdownItem[][] = [
         <div v-else>
         </div>
     </div>
-    <UModal v-model="loginModalOpen">
-        <UButton class="close-fab" variant="link" color="gray" @click="loginModalOpen = false" icon="i-mdi-close" />
-        <div class="login-options">
-            <h3 class="text-3xl text-center">Login to VeloCity</h3>
-            <UButton color="blue" @click="signIn('google', {callbackUrl: '/dashboard'})">
-                <UIcon name="i-mdi-google" />
-                Login with Google
-            </UButton>
-        </div>
-    </UModal>
+    <ModalsSignIn v-model:open="loginModalOpen" />
 </template>
 <style scoped lang="scss">
-
-.close-fab {
-    @apply absolute top-1 left-1 w-6 h-6;
-}
-
-.login-options {
-    @apply m-4 grid items-start justify-center gap-3;
-}
 
 </style>
