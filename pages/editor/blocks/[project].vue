@@ -151,13 +151,40 @@ function beforeLeave(event: Event) {
     }
 }
 
+const editorContainer: Ref<HTMLElement | undefined> = ref()
+const resizing = ref(false)
+
+function startResizePanels(event: MouseEvent) {
+    const resizer = event.target as HTMLElement
+    const pane = resizer.previousElementSibling as HTMLElement
+    const initialWidth = pane.offsetWidth
+    resizing.value = true
+
+    const onMouseMove = (e: MouseEvent) => {
+        const paneWidth = Math.max(initialWidth + (e.pageX - event.pageX), 150)
+        pane.style.width = paneWidth + 'px'
+    }
+
+    const onMouseUp = (e: MouseEvent) => {
+        pane.style.width = pane.clientWidth + 'px'
+
+        window.removeEventListener('mousemove', onMouseMove)
+        window.removeEventListener('mouseup', onMouseUp)
+        resizing.value = false
+    }
+
+    window.addEventListener('mousemove', onMouseMove)
+    window.addEventListener('mouseup', onMouseUp)
+}
+
 </script>
 <template>
     <div class="relative" :class="{'select-none': dragState.draggedBlocks}">
         <EditorNavbar v-if="project" :project="project" @refresh-project="refresh()" />
-        <div class="editor-container">
-            <EditorBlockPalette />
-            <div class="w-auto relative" @mouseup.left="releaseBlocks" ref="canvasElement">
+        <div class="editor-container" ref="editorContainer">
+            <EditorBlockPalette class="select-none" />
+            <div class="resizer" :class="{active: resizing}" @mousedown.left="startResizePanels($event)"></div>
+            <div class="w-auto relative resize-x" @mouseup.left="releaseBlocks" ref="canvasElement">
                 <div v-for="group in blocks" :key="group" class="absolute pointer-events-none" :style="{top: group.yPos + 'px', left: group.xPos + 'px'}">
                     <EditorBlockGroupRender :group="group" @pick-up="(event, newGroup, pickedUp) => pickUpGroup(event, group, newGroup, pickedUp)" :is-template="false" />
                 </div>
@@ -171,8 +198,16 @@ function beforeLeave(event: Event) {
 </template>
 <style scoped lang="scss">
 .editor-container {
-    @apply fixed top-16 left-0 grid grid-cols-[1fr_6fr];
+    @apply fixed top-16 left-0 grid grid-cols-[1fr_5px_6fr];
     height: calc(100vh - 4rem);
+}
+
+.resizer {
+    @apply cursor-ew-resize;
+
+    &.active {
+        @apply bg-gray-300 bg-opacity-50;
+    }
 }
 
 .dragged-element {
