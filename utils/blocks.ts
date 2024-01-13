@@ -68,7 +68,7 @@ export interface TypedSelectOption extends SelectOption {
 
 export interface BlockAction<T> {
     label: string
-    run(ctx: BlockEditor, block: Block<T>): Block<T>
+    run(ctx: BlockEditor, block: Block<T>): Block
 }
 
 export interface BlockEditor {
@@ -90,6 +90,7 @@ export async function createRegistry() {
         onReady: new events.OnReady(),
         comparison: new logic.Comparison(),
         unary: new logic.UnaryOperation(),
+        logicGate: new logic.BinaryLogicGate(),
         literal: new values.LiteralValue(),
         elementEvent: new events.ElementEvent(),
         callable: new fields.CallableBlock(),
@@ -101,6 +102,7 @@ export async function createRegistry() {
         sendTriggeredEmail: new crm.SendTriggeredEmail(),
         createContact: new crm.CreateContact(),
         createFilter: new data.CreateFilter(),
+        setFilter: new data.SetFilter(),
         error: new values.ErrorBlock()
     }
 }

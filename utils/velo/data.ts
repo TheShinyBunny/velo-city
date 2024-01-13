@@ -2,7 +2,7 @@ import {type Block, type BlockPiece, ExpressionBlock, type Property} from '~/uti
 import type { Compiler } from '../compiler'
 import type {ExpressionType} from '~/utils/types'
 import {isPartialMatch} from '~/utils/helpers'
-import type {MultiCallableData} from '~/utils/fields'
+import {FieldSetterBlock, type FieldSetterData, type MultiCallableData} from '~/utils/fields'
 import {stringFunctions} from '~/utils/strings'
 import type {ComparisonData, UnaryData} from '~/utils/logic'
 
@@ -135,7 +135,7 @@ export interface FilterData {
 export class CreateFilter extends ExpressionBlock<FilterData> {
     color: string = 'bg-teal-500'
     render(data: FilterData): BlockPiece<FilterData>[] {
-        return ['Create a Filter with conditions:', ...data.filters.map((filter, index): Property => {
+        return ['Create a Filter where:', ...data.filters.map((filter, index): Property => {
             return {...filter, onAttachedBlockChange: (prop, self, removed) => {
                     removed.data = this.revertBlock(removed)
                     const filters = [...self.data.filters]
@@ -195,6 +195,23 @@ export class CreateFilter extends ExpressionBlock<FilterData> {
     }
 }
 
+export class SetFilter extends FieldSetterBlock {
+    render(data: FieldSetterData): BlockPiece<FieldSetterData>[] {
+        data.value.canAttachBlock = this.isFilterBlock
+        return ['Set', data.label, 'of', data.target, 'to', data.value]
+    }
+
+    private isFilterBlock(property: Property, block: Block) {
+        if (block.type === 'createFilter') {
+            return
+        }
+        if (block.type == 'logicGate') {
+            return
+        }
+        return 'This block cannot be used as a Filter'
+    }
+}
+
 
 export function data(): Block[] {
     return [
@@ -202,6 +219,15 @@ export function data(): Block[] {
             type: 'createFilter',
             data: {
                 filters: []
+            }
+        },
+        {
+            type: 'setFilter',
+            data: {
+                target: createProp('Dataset', 'element'),
+                key: 'setFilter',
+                label: 'Filter',
+                value: createProp('Filter', 'any')
             }
         }
     ]

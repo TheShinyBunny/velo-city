@@ -10,7 +10,7 @@ let groups = ref<BlockPiece<any>[][]>([])
 const renderedBlock = ref<Block>(props.block)
 provide('currentBlock', {
     get: () => renderedBlock.value,
-    set: (newBlock) => emit('updateBlock', newBlock)
+    set: (newBlock: Block) => emit('updateBlock', newBlock)
 })
 
 onMounted(() => {

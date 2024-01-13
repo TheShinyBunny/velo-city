@@ -1,6 +1,7 @@
 import {
     type Block,
     type BlockAction,
+    type BlockEditor,
     type BlockPiece,
     ExpressionBlock,
     type Property,
@@ -134,9 +135,88 @@ export class UnaryOperation extends ExpressionBlock<UnaryData> {
         return data.resultType
     }
 
+    getActions(data: UnaryData): BlockAction<UnaryData>[] {
+        return [
+            {
+                label: 'Remove Negation',
+                run(ctx: BlockEditor, block: Block<UnaryData>): Block<UnaryData> {
+                    return block.data!.value.value!
+                }
+            }
+        ]
+    }
+
+}
+
+export interface BinaryGateData {
+    left: Property
+    right: Property
+    label: string
+    operand: string
+}
+
+const logicGates: SelectOption[] = [
+    {
+        label: 'And',
+        value: '&&'
+    },
+    {
+        label: 'Or',
+        value: '||'
+    }
+]
+
+export class BinaryLogicGate extends ExpressionBlock<BinaryGateData> {
+    color: string = 'bg-green-500'
+
+    compile(ctx: Compiler, data: BinaryGateData): void {
+
+    }
+
+    getResultType(data: BinaryGateData): ExpressionType {
+        return 'boolean'
+    }
+
+    render(data: BinaryGateData): BlockPiece<BinaryGateData>[] {
+        return [data.left, {options: logicGates, value: data.operand, largeLabels: true, onChange: (value, block) => {
+                return withData(block, {
+                    operand: value
+                })
+            }}, data.right]
+    }
+
+    getActions(data: BinaryGateData): BlockAction<BinaryGateData>[] {
+        return [
+            {
+                label: 'Swap Left & Right',
+                run(ctx, block) {
+                    return withData(block, {
+                        left: {...block.data!.left, value: block.data!.right.value},
+                        right: {...block.data!.right, value: block.data!.left.value}
+                    })
+                }
+            },
+            {
+                label: 'Add Negation',
+                run(ctx: BlockEditor, block: Block<BinaryGateData>): Block<UnaryData> {
+                    return {
+                        type: 'unary',
+                        data: {
+                            value: {label: 'Value', type: 'any', value: block},
+                            label: 'Not',
+                            operand: '!',
+                            resultType: 'boolean'
+                        }
+                    }
+                }
+            }
+        ]
+    }
+
 }
 
 export const logic: Block[] = [
     {type: 'comparison', data: {operand: operands[0], left: createProp('Left', 'any'), right: createProp('Right', 'any')}},
-    {type: 'unary', data: {value: {label: 'Value', type: 'any'}, label: 'Not', operand: '!', resultType: 'boolean'}},
+    {type: 'unary', data: {value: createProp('Value', 'any'), label: 'Not', operand: '!', resultType: 'boolean'}},
+    {type: 'logicGate', data: {left: {label: 'Value', type: 'boolean'}, right: {label: 'Value', type: 'boolean'}, label: 'And', operand: '&&'}},
 ]
