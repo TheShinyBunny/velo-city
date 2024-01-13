@@ -18,7 +18,9 @@ export default NuxtAuthHandler({
             return session
         },
         async jwt({token, user}) {
-            token.userId = user.id
+            if (user) {
+                token.userId = user.id
+            }
             return token
         }
     },
