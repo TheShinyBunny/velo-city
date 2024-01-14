@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useMouse, useWindowScroll } from '@vueuse/core'
 import type {
   AdjacentAttachment,
   Block,
@@ -9,7 +8,6 @@ import type {
   BlockType,
   SelectionPiece
 } from '~/utils/blocks'
-import { isInsideTemplate } from '~/utils/injection-keys'
 
 const emit = defineEmits(['startDragging', 'groupChanged', 'updateBlock', 'removeBlock'])
 

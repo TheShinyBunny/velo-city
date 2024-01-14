@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { DropdownItem } from '#ui/types'
-import { useUrlSearchParams } from '@vueuse/core'
 
 const searchParams = useUrlSearchParams()
 

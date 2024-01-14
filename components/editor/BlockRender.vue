@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import { useMouse } from '@vueuse/core'
 import type { Block, BlockGroup, BlockPiece } from '~/utils/blocks'
-import { currentBlock, isInsideTemplate } from '~/utils/injection-keys'
 
 const props = defineProps<{block: Block}>()
 const isTemplate = inject(isInsideTemplate, false)

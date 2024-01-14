@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { BlockCategory } from '~/utils/palette'
 import { type Block } from '~/utils/blocks'
-import { isInsideTemplate } from '~/utils/injection-keys'
 
 const { category } = defineProps<{category: BlockCategory}>()
 defineEmits(['selected'])

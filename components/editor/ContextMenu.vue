@@ -2,7 +2,6 @@
 import type { DropdownItem } from '#ui/types'
 import type { Block, BlockGroup } from '~/utils/blocks'
 import { EventBlockType } from '~/utils/events'
-import { parentGroup } from '~/utils/injection-keys'
 
 const { open, block } = defineProps<{open: boolean, block: Block}>()
 const emit = defineEmits(['update:open', 'deleteBlock'])

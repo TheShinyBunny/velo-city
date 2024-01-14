@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { useMouse } from '@vueuse/core'
 import type { AdjacentAttachment, BlockGroup, SlotAttachment } from '~/utils/blocks'
 import { SaveStatus } from '~/composables/useSaveState'
-import { projectActions } from '~/utils/injection-keys'
-
-const { $client } = useNuxtApp()
 
 const AUTO_SAVE_TIMEOUT = 5000
 
 const dragState = useDragState()
+const { $client } = useNuxtApp()
 const mousePos = useMouse({ type: 'page' })
 const blocks = useEditorBlocks()
 const attach = useAttachTarget()

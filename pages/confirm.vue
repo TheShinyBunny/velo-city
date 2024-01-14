@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useUrlSearchParams } from '@vueuse/core'
-
 const { $client } = useNuxtApp()
 const searchParams = useUrlSearchParams()
 

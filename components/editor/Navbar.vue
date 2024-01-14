@@ -3,7 +3,6 @@ import type { Project } from '@prisma/client'
 import type { DropdownItem } from '#ui/types'
 import { SaveStatus } from '~/composables/useSaveState'
 import type { BlockGroup } from '~/utils/blocks'
-import { projectActions } from '~/utils/injection-keys'
 
 const { project } = defineProps<{project: Project}>()
 const emit = defineEmits(['refreshProject'])

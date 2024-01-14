@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { AdjacentAttachment, Block, BlockGroup } from '~/utils/blocks'
-import { isInsideTemplate, parentGroup, projectActions } from '~/utils/injection-keys'
 
 const { group, isTemplate } = defineProps<{group: BlockGroup, isTemplate: boolean}>()
 const emit = defineEmits(['pickUp'])

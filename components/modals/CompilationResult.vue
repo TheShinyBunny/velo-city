@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { useClipboard } from '@vueuse/core'
-
 const { open, results } = defineProps<{open: boolean, results: string}>()
 defineEmits(['update:open'])
 const { copy, copied } = useClipboard()

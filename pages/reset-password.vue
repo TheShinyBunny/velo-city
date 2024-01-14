@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useUrlSearchParams } from '@vueuse/core'
 import type { User } from '@prisma/client'
 
 const { $client } = useNuxtApp()
