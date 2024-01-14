@@ -49,9 +49,10 @@ model User {
 }
 
 model VerificationToken {
-  identifier String   @id @map("_id")
-  token      String   @unique
+  identifier String    @id @map("_id")
+  token      String    @unique
   expires    DateTime
+  type       TokenType
 
   @@unique([identifier, token])
 }
@@ -63,6 +64,11 @@ model Project {
   creatorId String       @db.ObjectId
   structure BlockGroup[]
   creator   User         @relation(fields: [creatorId], references: [id])
+}
+
+enum TokenType {
+  REGISTER
+  PASSWORD_RESET
 }
 
 type BlockGroup {

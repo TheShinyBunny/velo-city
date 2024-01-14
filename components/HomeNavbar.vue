@@ -1,8 +1,18 @@
 <script setup lang="ts">
 import type { DropdownItem } from '#ui/types'
+import { useUrlSearchParams } from '@vueuse/core'
+
+const searchParams = useUrlSearchParams()
 
 const { status, data, signOut } = useAuth()
 const loginModalOpen = ref(false)
+
+onMounted(() => {
+  if (searchParams.openLogin) {
+    loginModalOpen.value = true
+    delete searchParams.openLogin
+  }
+})
 
 const userMenuItems: DropdownItem[][] = [
   [

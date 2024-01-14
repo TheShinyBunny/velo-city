@@ -1,7 +1,6 @@
 import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import EmailProvider from 'next-auth/providers/email'
 import { User } from '@prisma/client'
 import bcrypt from 'bcrypt'
 import { NuxtAuthHandler } from '#auth'
@@ -52,8 +51,6 @@ export default NuxtAuthHandler({
         }
 
         const passwordMatch = await bcrypt.compare(credentials.password, user.password)
-
-        // if password does not match
         if (!passwordMatch) {
           throw new Error('Invalid Email or Password')
         }
@@ -64,11 +61,6 @@ export default NuxtAuthHandler({
 
         return user
       }
-    }),
-    // @ts-expect-error
-    EmailProvider.default({
-      from: '',
-      id: 'verify'
     })
   ],
   pages: {
